@@ -1,0 +1,81 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\@wee\\TheGameName\\The-game-name\\TheGameName\\TheGameName\\TheGameName.csproj": {}
+  },
+  "projects": {
+    "D:\\@wee\\TheGameName\\The-game-name\\TheGameName\\TheGameName\\TheGameName.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\@wee\\TheGameName\\The-game-name\\TheGameName\\TheGameName\\TheGameName.csproj",
+        "projectName": "TheGameName",
+        "projectPath": "D:\\@wee\\TheGameName\\The-game-name\\TheGameName\\TheGameName\\TheGameName.csproj",
+        "packagesPath": "C:\\Users\\daHil\\.nuget\\packages\\",
+        "outputPath": "D:\\@wee\\TheGameName\\The-game-name\\TheGameName\\TheGameName\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\daHil\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "MonoGame.Content.Builder.Task": {
+              "target": "Package",
+              "version": "[3.8.1.303, )"
+            },
+            "MonoGame.Framework.DesktopGL": {
+              "target": "Package",
+              "version": "[3.8.1.303, )"
+            },
+            "NUnit": {
+              "target": "Package",
+              "version": "[3.13.3, )"
+            },
+            "NUnit3TestAdapter": {
+              "target": "Package",
+              "version": "[4.4.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.402\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

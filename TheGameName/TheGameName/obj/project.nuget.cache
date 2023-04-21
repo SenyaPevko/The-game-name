@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "QP8RjIQVso3QT9Gt9HhJXBTrt78zTLSaS+812a0rf3PrqrVLV7S5Dekv9s+xwSitd9P7eRpO+gVG1jzZGobw2Q==",
+  "success": true,
+  "projectFilePath": "D:\\@wee\\TheGameName\\The-game-name\\TheGameName\\TheGameName\\TheGameName.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\daHil\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\daHil\\.nuget\\packages\\monogame.content.builder.task\\3.8.1.303\\monogame.content.builder.task.3.8.1.303.nupkg.sha512",
+    "C:\\Users\\daHil\\.nuget\\packages\\monogame.framework.desktopgl\\3.8.1.303\\monogame.framework.desktopgl.3.8.1.303.nupkg.sha512",
+    "C:\\Users\\daHil\\.nuget\\packages\\netstandard.library\\2.0.0\\netstandard.library.2.0.0.nupkg.sha512",
+    "C:\\Users\\daHil\\.nuget\\packages\\nunit\\3.13.3\\nunit.3.13.3.nupkg.sha512",
+    "C:\\Users\\daHil\\.nuget\\packages\\nunit3testadapter\\4.4.2\\nunit3testadapter.4.4.2.nupkg.sha512"
+  ],
+  "logs": []
+}
