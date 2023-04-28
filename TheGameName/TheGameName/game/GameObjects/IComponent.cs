@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 using System.ComponentModel;
 using TheGameName;
 
-interface IComponent : IGameEntity
+interface IComponent
 {
     public Texture2D Texture { get; set; }
     public Vector2 Scale { get; set; }

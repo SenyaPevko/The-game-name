@@ -8,13 +8,13 @@ using Microsoft.Xna.Framework.Input;
 
 namespace TheGameName;
 
-public class EntityManager:IUpdatable
+public class EntityController : IUpdatable
 {
     private readonly List<IGameEntity> gameEntities = new List<IGameEntity>();
     private readonly List<IGameEntity> entitiesToAdd = new List<IGameEntity>();
     private readonly List<IGameEntity> entitiesToRemove = new List<IGameEntity>();
 
-    public EntityManager()
+    public EntityController()
     {
 
     }
@@ -25,7 +25,7 @@ public class EntityManager:IUpdatable
     public bool AddEntity(IGameEntity entity)
     {
         if (entity is null) throw new ArgumentNullException("U're trying to add an empty entity");
-        if(HasEntity(entity)) return false;
+        if (HasEntity(entity)) return false;
         entitiesToAdd.Add(entity);
         return true;
     }
@@ -42,25 +42,53 @@ public class EntityManager:IUpdatable
     {
         foreach (var entity in gameEntities.OrderBy(entity => entity.UpdateOrder))
         {
-            entity.Update(gameTime);
+            foreach(var entityToIntersect in gameEntities)
+            {
+                if(Collide(entity, entityToIntersect))
+                {
+                    if (entityToIntersect.Type == "Bullet" && ((Bullet)entityToIntersect).Sender != entity)
+                    {
+                        entity.TakeDamage(entityToIntersect.Damage);
+                        entityToIntersect.TakeDamage(entityToIntersect.Damage);
+                    }
+                    else if (entity.Type == "Bullet" && ((Bullet)entity).Sender != entityToIntersect)
+                    {
+                        entityToIntersect.TakeDamage(entity.Damage);
+                        entity.TakeDamage(entity.Damage);
+                    }
+                }
+            }
+            if (entity.IsAlive)
+                entity.Update(gameTime);
+            else entitiesToRemove.Add(entity);
         }
 
-        foreach(var entity in entitiesToAdd)
+        foreach (var entity in entitiesToAdd)
         {
             gameEntities.Add(entity);
         }
 
-        foreach(var entity in entitiesToRemove)
+        foreach (var entity in entitiesToRemove)
         {
             gameEntities.Remove(entity);
         }
+        entitiesToAdd.Clear();
+        entitiesToRemove.Clear();
     }
 
     public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
     {
-        foreach(var entity in gameEntities.OrderBy(entity => entity.DrawOrder))
+        foreach (var entity in gameEntities.OrderBy(entity => entity.DrawOrder))
         {
             entity.Draw(spriteBatch, gameTime);
         }
+    }
+
+    public bool Collide(IGameEntity entity, IGameEntity entityToIntersect)
+    {
+        if (entity == entityToIntersect) return false;
+        if (entity.Rectangle.Intersects(entityToIntersect.Rectangle)) 
+            return true;
+        return false;
     }
 }

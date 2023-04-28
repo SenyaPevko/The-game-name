@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace TheGameName;
 
-public class Bullet : IComponent
+public class Bullet : IGameEntity
 {
     public double damage = 5d;
     public float speed = 6f;
@@ -20,15 +20,22 @@ public class Bullet : IComponent
     public Rectangle Rectangle { get; set; }
     public int UpdateOrder { get; set; } = 0;
     public int DrawOrder { get; set; } = 0;
+    public double Health { get; set; } = 0.0001;
+    public double Damage { get; set; } = 2;
+    public bool IsAlive { get; set; } = true;
+    public string Type { get; set; } = "Bullet";
+    public IGameEntity Sender { get; private set; }
 
     private readonly RenderStateController renderStateController = new RenderStateController();
 
-    public Bullet(Texture2D Texture, Player player)
+    public Bullet(Texture2D Texture, IGameEntity sender, Vector2 target)
     {
         this.Texture = Texture;
-        Position = player.Position;
-        direction = -player.Position + Globals.cursor.Position;
-        rotation = MathOperations.GetAngleBetweenPoints(player.Position.ToPoint(), Globals.cursor.Position.ToPoint());
+        Position = sender.Position;
+        direction = -sender.Position + target;
+        rotation = MathOperations.GetAngleBetweenPoints(sender.Position.ToPoint(), target.ToPoint());
+        Rectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
+        Sender = sender;
     }
 
     public void Update(GameTime gameTime)
@@ -37,7 +44,7 @@ public class Bullet : IComponent
         var x = Position.X + direction.X * speed;
         var y = Position.Y + direction.Y * speed;
         Position = new Vector2(x, y);
-        Rectangle = new Rectangle(Position.ToPoint(), new Point(Texture.Width, Texture.Height));
+        Rectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
     }
 
     public void Draw(SpriteBatch spriteBatch, GameTime gameTime)

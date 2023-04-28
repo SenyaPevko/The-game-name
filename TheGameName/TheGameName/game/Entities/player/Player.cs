@@ -6,23 +6,31 @@ using Microsoft.Xna.Framework.Input;
 
 namespace TheGameName;
 
-public class Player : Unit, IGameEntity
+public class Player : IGameEntity, ICanAttack
 {
     private const int WALK_SPRITE_COUNT = 3;
     private const int ATTACK_SPRITE_COUNT = 9;
     private const int DAMAGED_SPRITE_COUNT = 2;
     private const int SPRITE_HEIGHT = 34;
     private const int SPRITE_WIDTH = 32;
-    private const int ATTACK_ANIM_FPS = 10;
     private const int MAGAZINE_SIZE = 10;
-    private const double FIRE_RATE = 60;
+    private const double ATTACK_RATE = 100;
 
     private readonly RenderStateController renderStateController = new RenderStateController();
 
-    public float Speed { get; set; } = 2;
+    private float Speed { get; set; } = 2;
+    public double Health { get; set; } = 10;
+    public Vector2 Position { get; set; }
+    public int UpdateOrder { get; set; } = 0;
+    public int DrawOrder { get; set; } = 0;
     public string CurrentState { get; private set; } = nameof(PlayerTextureContainer.WalkUp);
-    public int bulletsCounter = MAGAZINE_SIZE;
-    public double shootDelayTimer;
+    public double Damage { get; set; }
+    public bool IsAlive { get; set; } = true;
+    public Rectangle Rectangle { get; set; }
+    public string Type { get; set; } = "Player";
+    public int AttackCounter { get; set; } = MAGAZINE_SIZE;
+    public double AttackDelayTimer { get; set; }
+
     public Texture2D bulletTexture;
 
 
@@ -51,12 +59,13 @@ public class Player : Unit, IGameEntity
                 { Fps = ATTACK_ANIM_FPS};
                 attackAnimation.AnimationCompleted += Attack_AnimationCompleted;
                 renderStateController.AddState(nameof(PlayerTextureContainer.Attack), attackAnimation);*/
+        Rectangle = new Rectangle((int)Position.X, (int)Position.Y, SPRITE_WIDTH, SPRITE_HEIGHT);
     }
 
-/*    private void Attack_AnimationCompleted(object sender, AnimationCompletedEventArgs e)
-    {
-        renderStateController.SetState(nameof(PlayerTextureContainer.Idle));
-    }*/
+    /*    private void Attack_AnimationCompleted(object sender, AnimationCompletedEventArgs e)
+        {
+            renderStateController.SetState(nameof(PlayerTextureContainer.Idle));
+        }*/
 
     public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
     {
@@ -66,6 +75,7 @@ public class Player : Unit, IGameEntity
     public void Update(GameTime gameTime)
     {
         renderStateController.Update(gameTime);
+        Rectangle = new Rectangle((int)Position.X, (int)Position.Y, SPRITE_WIDTH, SPRITE_HEIGHT);
     }
 
     public void Move(Vector2 direction, string state)
@@ -85,21 +95,29 @@ public class Player : Unit, IGameEntity
 
     public bool Attack(GameTime gameTime)
     {
-        if (bulletsCounter <= 0) return false;
-        shootDelayTimer += gameTime.ElapsedGameTime.Milliseconds;
-        if (shootDelayTimer > FIRE_RATE) 
+        if (AttackCounter <= 0) return false;
+        AttackDelayTimer += gameTime.ElapsedGameTime.Milliseconds;
+        if (AttackDelayTimer > ATTACK_RATE)
         {
-            shootDelayTimer = 0;
+            AttackDelayTimer = 0;
             //renderStateController.SetState(nameof(PlayerTextureContainer.Attack));
             //renderStateController.CurrentState.Animation.Play();
-            Globals.bulletsContoller.AddBulletToFired(this);
-            bulletsCounter--;
+            Globals.bulletsContoller.AddBulletToFired(this, Globals.cursor.Position);
+            AttackCounter--;
+            return true;
         }
-        return true;
+        return false;
     }
 
-    public void Reload()
+    public void Reload(GameTime gameTime)
     {
-        bulletsCounter = MAGAZINE_SIZE;
+        AttackCounter = MAGAZINE_SIZE;
+        AttackDelayTimer = -1000;
+    }
+
+    public virtual void TakeDamage(double damage)
+    {
+        Health -= damage;
+        if (Health <= 0) IsAlive = false;
     }
 }

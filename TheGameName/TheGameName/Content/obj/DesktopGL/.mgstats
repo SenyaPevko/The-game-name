@@ -1,2 +1,2 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
-"D:/@wee/TheGameName/The-game-name/TheGameName/TheGameName/Content/bullet/bullet.png","D:/@wee/TheGameName/The-game-name/TheGameName/TheGameName/Content/bin/DesktopGL/bullet/bullet.xnb","TextureProcessor","Texture2DContent",237,1045,0,2264448
+"D:/@wee/TheGameName/The-game-name/TheGameName/TheGameName/Content/File.spritefont","D:/@wee/TheGameName/The-game-name/TheGameName/TheGameName/Content/bin/DesktopGL/font.xnb","FontDescriptionProcessor","SpriteFontContent",2068,21535,0,3840387

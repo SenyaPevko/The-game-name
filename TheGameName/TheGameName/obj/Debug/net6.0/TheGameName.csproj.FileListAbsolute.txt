@@ -47,3 +47,5 @@ D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Conte
 D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Cursor\cursor.xnb
 D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\cursorAngle.xnb
 D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\bullet\bullet.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Enemy\test.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\font.xnb

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 using System.Net.Http.Headers;
 using System.Security.Authentication.ExtendedProtection;
 using static System.Net.Mime.MediaTypeNames;
@@ -15,6 +16,9 @@ namespace TheGameName
         private Player player;
         private PlayerController playerController;
         private Camera camera;
+        private EnemySpawner enemySpawner;
+        private SpriteFont font;
+
 
         private Texture2D background;
 
@@ -53,6 +57,10 @@ namespace TheGameName
             Texture2D walkDownRightTexture = Content.Load<Texture2D>("Player/down-right");
             Texture2D walkLeftTexture = Content.Load<Texture2D>("Player/left");
             Texture2D walkRightTexture = Content.Load<Texture2D>("Player/right");
+            Texture2D enemyTexture = Content.Load<Texture2D>("Enemy/test");
+
+            font = Content.Load<SpriteFont>("font");
+
             //Texture2D attackTexture = Content.Load<Texture2D>("Player/attack");
 
             PlayerTextureContainer container = new PlayerTextureContainer
@@ -72,10 +80,13 @@ namespace TheGameName
                 Position = new Vector2(150, 100)
             };
 
+            Globals.entityController = new EntityController();
+            Globals.entityController.AddEntity(player);
             playerController = new PlayerController(player);
             camera = new Camera(player);
             Globals.cursor = new Cursor(cursorTexture);
             Globals.bulletsContoller = new BulletsContoller(bulletTexture);
+            enemySpawner = new EnemySpawner(enemyTexture, new Vector2(0, 0), player);
         }
 
         protected override void Update(GameTime gameTime)
@@ -87,11 +98,11 @@ namespace TheGameName
 
             base.Update(gameTime);
 
-            player.Update(gameTime);
+            Globals.entityController.Update(gameTime);
             playerController.Update(gameTime);
             camera.Update(gameTime);
             Globals.cursor.Update(gameTime);
-            Globals.bulletsContoller.Update(gameTime);
+            enemySpawner.SpawnEnemy(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -100,16 +111,21 @@ namespace TheGameName
 
             // TODO: Add your drawing code here
 
+
             base.Draw(gameTime);
 
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null,
                   camera.get_transformation(GraphicsDevice));
+            _spriteBatch.Draw(background, new Rectangle(0, 0, Globals.screenWidth, Globals.screenHeight), Color.White);
 
-            _spriteBatch.Draw(background, new Rectangle(0, 0, 800, 480), Color.White);
-
-            player.Draw(_spriteBatch, gameTime);
-            Globals.bulletsContoller.Draw(_spriteBatch, gameTime);
+            Globals.entityController.Draw(_spriteBatch, gameTime);
             Globals.cursor.Draw(_spriteBatch, gameTime);
+            if (!player.IsAlive)
+            {
+                _graphics.GraphicsDevice.Clear(Color.Black);
+                _spriteBatch.DrawString(font, "GAME OVER", new Vector2(Globals.screenWidth / 2, Globals.screenHeight / 2), Color.IndianRed);
+                //resetBtn.Draw(gameTime, spriteBatch);
+            }
             _spriteBatch.End();
         }
     }

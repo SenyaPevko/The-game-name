@@ -10,7 +10,7 @@ namespace TheGameName;
 
 public class BulletsContoller : IUpdatable
 {
-    private List<Bullet> bulletsFired = new List<Bullet> { };
+    private List<Bullet> bulletsFired = new List<Bullet>();
     private Texture2D bulletTexture;
 
     public BulletsContoller(Texture2D bulletTexture)
@@ -39,17 +39,10 @@ public class BulletsContoller : IUpdatable
         }
     }
 
-    public void AddBulletToFired(Player player)
+    public void AddBulletToFired(IGameEntity sender, Vector2 target)
     {
-        var bullet = new Bullet(bulletTexture, player);
+        var bullet = new Bullet(bulletTexture, sender, target);
         bulletsFired.Add(bullet);
-    }
-
-    public void Draw(SpriteBatch spritebatch, GameTime gameTime)
-    {
-        foreach (var bullet in bulletsFired)
-        {
-            bullet.Draw(spritebatch, gameTime);
-        }
+        Globals.entityController.AddEntity(bullet);
     }
 }

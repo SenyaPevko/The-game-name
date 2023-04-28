@@ -34,17 +34,17 @@ public class PlayerController : IUpdatable
         if (currentKeyboardState.IsKeyDown(Keys.A))
         {
             if (currentKeyboardState.IsKeyDown(Keys.S))
-                player.Move(new Vector2(-1, 1), nameof(PlayerTextureContainer.WalkDownLeft));
+                player.Move(new Vector2(-(float)Math.Sqrt(2)/2, (float)Math.Sqrt(2) / 2), nameof(PlayerTextureContainer.WalkDownLeft));
             else if (currentKeyboardState.IsKeyDown(Keys.W))
-                player.Move(new Vector2(-1, -1), nameof(PlayerTextureContainer.WalkUpLeft));
+                player.Move(new Vector2(-(float)Math.Sqrt(2) / 2, -(float)Math.Sqrt(2) / 2), nameof(PlayerTextureContainer.WalkUpLeft));
             else player.Move(new Vector2(-1, 0), nameof(PlayerTextureContainer.WalkLeft));
         }
         else if (currentKeyboardState.IsKeyDown(Keys.D))
         {
             if (currentKeyboardState.IsKeyDown(Keys.S))
-                player.Move(new Vector2(1, 1), nameof(PlayerTextureContainer.WalkDownRight));
+                player.Move(new Vector2((float)Math.Sqrt(2) / 2, (float)Math.Sqrt(2) / 2), nameof(PlayerTextureContainer.WalkDownRight));
             else if (currentKeyboardState.IsKeyDown(Keys.W))
-                player.Move(new Vector2(1, -1), nameof(PlayerTextureContainer.WalkUpRight));
+                player.Move(new Vector2((float)Math.Sqrt(2) / 2, -(float)Math.Sqrt(2) / 2), nameof(PlayerTextureContainer.WalkUpRight));
             else player.Move(new Vector2(1, 0), nameof(PlayerTextureContainer.WalkRight));
         }
         else if (currentKeyboardState.IsKeyDown(Keys.S))
@@ -63,11 +63,11 @@ public class PlayerController : IUpdatable
         }
         if (currentMouseState.LeftButton == ButtonState.Released)
         {
-            player.shootDelayTimer = 0;
+            player.AttackDelayTimer = 0;
         }
         if (currentKeyboardState.IsKeyDown(Keys.C))
         {
-            player.Reload();
+            player.Reload(gameTime);
         }
     }
 }
