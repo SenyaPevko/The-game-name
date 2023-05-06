@@ -49,3 +49,7 @@ D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Conte
 D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\bullet\bullet.xnb
 D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Enemy\test.xnb
 D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\font.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Tiles\tileset.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\map.txt
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\map2.txt
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Tiles\tileset2.xnb

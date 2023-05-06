@@ -42,22 +42,26 @@ public class EntityController : IUpdatable
     {
         foreach (var entity in gameEntities.OrderBy(entity => entity.UpdateOrder))
         {
-            foreach(var entityToIntersect in gameEntities)
+            // entities with tiles collision
+            foreach (Tile tile in Globals.tileMap)
             {
-                if(Collide(entity, entityToIntersect))
+                if (Collide(tile.Rectangle, entity.Rectangle))
                 {
-                    if (entityToIntersect.Type == "Bullet" && ((Bullet)entityToIntersect).Sender != entity)
-                    {
-                        entity.TakeDamage(entityToIntersect.Damage);
-                        entityToIntersect.TakeDamage(entityToIntersect.Damage);
-                    }
-                    else if (entity.Type == "Bullet" && ((Bullet)entity).Sender != entityToIntersect)
-                    {
-                        entityToIntersect.TakeDamage(entity.Damage);
-                        entity.TakeDamage(entity.Damage);
-                    }
+                    entity.Collide(entity, tile);
                 }
             }
+
+            foreach (var entityToIntersect in gameEntities)
+            {
+                if (entity == entityToIntersect) continue;
+                // entities colission
+                if(Collide(entity.Rectangle, entityToIntersect.Rectangle))
+                {
+                    entityToIntersect.Collide(entityToIntersect, entity);
+                    entity.Collide(entity, entityToIntersect);
+                }
+            }
+            
             if (entity.IsAlive)
                 entity.Update(gameTime);
             else entitiesToRemove.Add(entity);
@@ -84,10 +88,10 @@ public class EntityController : IUpdatable
         }
     }
 
-    public bool Collide(IGameEntity entity, IGameEntity entityToIntersect)
+    public bool Collide(Rectangle entity, Rectangle entityToIntersect)
     {
-        if (entity == entityToIntersect) return false;
-        if (entity.Rectangle.Intersects(entityToIntersect.Rectangle)) 
+        
+        if (entity.Intersects(entityToIntersect)) 
             return true;
         return false;
     }

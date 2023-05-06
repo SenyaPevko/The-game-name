@@ -6,33 +6,34 @@ using Microsoft.Xna.Framework.Input;
 
 namespace TheGameName;
 
+public enum EntityType
+{
+    Player,
+    Enemy,
+    Bullet,
+    Tile
+}
+
 public interface IGameEntity: IUpdatable
 {
-    int UpdateOrder { get; }
-    int DrawOrder { get; }
+    Order UpdateOrder { get; }
+    Order DrawOrder { get; }
 
-    public double Health { get; set; }
+    public double Health { get;}
 
-    public double Damage { get; set; }
+    public double Damage { get; }
 
-    public bool IsAlive { get; set; }
+    public bool IsAlive { get;}
 
-    public Rectangle Rectangle { get; set; }
+    public Rectangle Rectangle { get;}
 
-    public string Type { get; set; }
+    public EntityType Type { get;}
 
-    public Vector2 Position { get; set; }
-
-    void Update(GameTime gameTime);
+    public Vector2 Position { get;}
 
     void Draw(SpriteBatch spriteBatch, GameTime gameTime);
 
-    public virtual void TakeDamage(double damage)
-    {
-        Health -= damage;
-        if (Health <= 0)
-        {
-            IsAlive = false;
-        }
-    }
+    public void TakeDamage(double damage);
+
+    public void Collide(IGameEntity entity, IGameEntity entityToIntersect);
 }

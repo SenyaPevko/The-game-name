@@ -22,4 +22,5 @@ public class Globals
     public static Cursor cursor;
     public static BulletsContoller bulletsContoller;
     public static EntityController entityController;
+    public static TileMap tileMap;
 }

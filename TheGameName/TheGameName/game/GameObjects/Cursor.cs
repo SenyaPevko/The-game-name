@@ -7,13 +7,12 @@ using TheGameName;
 
 public class Cursor : IComponent
 {
-    public Texture2D Texture { get; set; }
-    public Vector2 Scale { get; set; }
-    public Vector2 Position { get; set; }
-    public Rectangle Rectangle { get; set; }
-    public int UpdateOrder { get; set; } = 0;
-    public int DrawOrder { get; set; } = 0;
-     private readonly RenderStateController renderStateController = new RenderStateController();
+    public Texture2D Texture { get; private set; }
+    public Vector2 Scale { get; private set; }
+    public Vector2 Position { get; private set; }
+    public Rectangle Rectangle { get; private set; }
+    public Order UpdateOrder { get; private set; } = Order.Cursor;
+    public Order DrawOrder { get; private set; } = Order.Cursor;
 
     public Cursor(Texture2D texture)
     {

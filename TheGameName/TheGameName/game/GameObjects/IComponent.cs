@@ -7,13 +7,12 @@ using TheGameName;
 
 interface IComponent
 {
-    public Texture2D Texture { get; set; }
-    public Vector2 Scale { get; set; }
-    public Vector2 Position { get; set; }
-    public Rectangle Rectangle { get; set; }
-    public int UpdateOrder { get; set; }
-
-    public int DrawOrder { get; set; }
+    public Texture2D Texture { get; }
+    public Vector2 Scale { get; }
+    public Vector2 Position { get; }
+    public Rectangle Rectangle { get; }
+    public Order UpdateOrder { get; }
+    public Order DrawOrder { get; }
 
     public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
     {

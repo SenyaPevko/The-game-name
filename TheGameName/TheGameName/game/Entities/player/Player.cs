@@ -21,21 +21,22 @@ public class Player : IGameEntity, ICanAttack
     private float Speed { get; set; } = 2;
     public double Health { get; set; } = 10;
     public Vector2 Position { get; set; }
-    public int UpdateOrder { get; set; } = 0;
-    public int DrawOrder { get; set; } = 0;
+    public Order UpdateOrder { get; set; } = Order.Player;
+    public Order DrawOrder { get; set; } = Order.Player;
     public string CurrentState { get; private set; } = nameof(PlayerTextureContainer.WalkUp);
     public double Damage { get; set; }
     public bool IsAlive { get; set; } = true;
     public Rectangle Rectangle { get; set; }
-    public string Type { get; set; } = "Player";
+    public EntityType Type { get; set; } = EntityType.Player;
     public int AttackCounter { get; set; } = MAGAZINE_SIZE;
     public double AttackDelayTimer { get; set; }
 
     public Texture2D bulletTexture;
 
 
-    public Player(TheGameName game, PlayerTextureContainer textureContainer)
+    public Player(TheGameName game, PlayerTextureContainer textureContainer, Vector2 position)
     {
+        Position = position;
         renderStateController.AddState(nameof(PlayerTextureContainer.WalkDown),
             new SpriteAnimation(textureContainer.WalkDown, WALK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT));
         renderStateController.AddState(nameof(PlayerTextureContainer.WalkDownLeft),
@@ -83,6 +84,10 @@ public class Player : IGameEntity, ICanAttack
         CurrentState = state;
         renderStateController.SetState(state);
         renderStateController.CurrentState.Animation.Play();
+        var nextPosition = Position + direction * Speed;
+        var nextTile = Globals.tileMap.GetTileByVectorPosition(nextPosition);
+        if (nextTile.Collision != TileCollision.Walkable && nextTile.Rectangle.Contains(nextPosition.ToPoint()))
+            return;
         Position += direction * Speed;
     }
 
@@ -115,9 +120,19 @@ public class Player : IGameEntity, ICanAttack
         AttackDelayTimer = -1000;
     }
 
-    public virtual void TakeDamage(double damage)
+    public void TakeDamage(double damage)
     {
         Health -= damage;
         if (Health <= 0) IsAlive = false;
+    }
+
+    public void Collide(IGameEntity entity, IGameEntity entityToIntersect)
+    {
+        if(entityToIntersect.Type == EntityType.Tile)
+        {
+            var tile = (Tile)entityToIntersect;
+            if (tile.Collision == TileCollision.Attackable)
+                TakeDamage(tile.Damage);
+        }
     }
 }

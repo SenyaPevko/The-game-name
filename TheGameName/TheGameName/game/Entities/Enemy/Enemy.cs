@@ -18,33 +18,32 @@ public class Enemy : IGameEntity, ICanAttack
     private float rotation;
     private double attackDelayTimer;
 
-    public int UpdateOrder => 2;
-    public int DrawOrder => 2;
-    public Vector2 Position { get; set; }
-    public Texture2D Texture { get; set; }
-    public float Speed { get; set; } = 1.5f;
-    public double Health { get; set; } = 4;
-    public bool IsAlive { get; set; } = true;
-    public double Damage { get; set; }
-    public Rectangle Rectangle { get; set; }
-    public string Type { get; set; } = "Enemy";
-    public Player player { get; set; }
-    public int AttackCounter { get; set; } = MAGAZINE_SIZE;
-    public double AttackDelayTimer { get; set; }
+    public Order UpdateOrder { get; private set; } = Order.Enemy;
+    public Order DrawOrder { get; private set; } = Order.Enemy;
+    public Vector2 Position { get; private set; }
+    public Texture2D Texture { get; private set; }
+    public float Speed { get; private set; } = 1.5f;
+    public double Health { get; private set; } = 4;
+    public bool IsAlive { get; private set; } = true;
+    public double Damage { get; private set; }
+    public Rectangle Rectangle { get; private set; }
+    public EntityType Type { get; private set; } = EntityType.Enemy;
+    public Player Player { get; private set; }
+    public int AttackCounter { get; private set; } = MAGAZINE_SIZE;
+    public double AttackDelayTimer { get; private set; }
 
 
     public Enemy(Vector2 position, Texture2D texture, Player player)
     {
         Position = position;
         Texture = texture;
-        this.player = player;
+        this.Player = player;
         Rectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
     }
 
     public void Update(GameTime gameTime)
     {
-        if (!Move(player.Position))
-            Attack(gameTime);
+        if (!Move()) Attack(gameTime);
         Rectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
     }
 
@@ -54,17 +53,31 @@ public class Enemy : IGameEntity, ICanAttack
             new Vector2(Texture.Width / 2, Texture.Height / 2), 1.0f, SpriteEffects.None, 0f);
     }
 
-    public bool Move(Vector2 targetPosition)
+    public bool Move()
     {
-        Vector2 direction = MathOperations.GetDirectionToPoint(Position.ToPoint(), targetPosition.ToPoint());
-        float angle = MathOperations.GetAngleBetweenPoints(Position.ToPoint(), targetPosition.ToPoint());
-        float distance = direction.Length();
-        direction.Normalize();
-        if (distance <= ATTACK_DISTANCE) return false;
-        var x = Position.X + direction.X * Speed;
-        var y = Position.Y + direction.Y * Speed;
+        var pathFinder = new EnemyMovementAI();
+        var nextTile = pathFinder.FindPath(Globals.tileMap, Position, Player.Position);
+        
+        var directionToNextTile = MathOperations.GetDirectionToPoint(Position.ToPoint(), nextTile.Rectangle.Center);
+        var angleToNextTile = MathOperations.GetAngleBetweenPoints(Position.ToPoint(), nextTile.Rectangle.Center);
+        directionToNextTile.Normalize();
+
+        var directionToPlayer = MathOperations.GetDirectionToPoint(Position.ToPoint(), Player.Position.ToPoint());
+        var angleToPlayer = MathOperations.GetAngleBetweenPoints(Position.ToPoint(), Player.Position.ToPoint());
+        var distanceToPlayer = directionToPlayer.Length();
+        directionToPlayer.Normalize();
+        if (distanceToPlayer <= ATTACK_DISTANCE && 
+            Globals.tileMap.GetTilesOnDirection(Position, Player.Position)
+            .Where(tile=>tile.Collision != TileCollision.Walkable)
+            .Count() == 0)
+        {
+            rotation = angleToPlayer;
+            return false;
+        }
+        var x = Position.X + directionToNextTile.X * Speed;
+        var y = Position.Y + directionToNextTile.Y * Speed;
         Position = new Vector2(x, y);
-        rotation = angle;
+        rotation = angleToNextTile;
         return true;
     }
 
@@ -75,8 +88,7 @@ public class Enemy : IGameEntity, ICanAttack
         if (attackDelayTimer > ATTACK_RATE)
         {
             attackDelayTimer = 0;
-            Globals.bulletsContoller.AddBulletToFired(this, player.Position);
-            //AttackCounter--;
+            Globals.bulletsContoller.AddBulletToFired(this, Player.Position);
             return true;
         }
         return false;
@@ -87,10 +99,14 @@ public class Enemy : IGameEntity, ICanAttack
         AttackCounter = MAGAZINE_SIZE;
     }
 
-    public virtual void TakeDamage(double damage)
+    public void TakeDamage(double damage)
     {
         Health -= damage;
         if (Health <= 0) IsAlive = false;
     }
 
+    public void Collide(IGameEntity entity, IGameEntity entityToIntersect)
+    {
+       
+    }
 }

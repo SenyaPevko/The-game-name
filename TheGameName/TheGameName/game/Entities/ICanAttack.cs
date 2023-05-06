@@ -6,9 +6,9 @@ public interface ICanAttack
     private const int MAGAZINE_SIZE = 10;
     private const double FIRE_RATE = 70;
 
-    public int AttackCounter { get; set; }
+    public int AttackCounter { get;}
 
-    public double AttackDelayTimer { get; set; }
+    public double AttackDelayTimer { get;}
 
     public bool Attack(GameTime gameTime);
 

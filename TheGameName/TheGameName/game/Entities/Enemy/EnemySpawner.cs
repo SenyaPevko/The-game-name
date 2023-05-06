@@ -36,4 +36,9 @@ public class EnemySpawner
             Globals.entityController.AddEntity(enemy);
         }
     }
+
+    public void ChangeTarget(Player player)
+    {
+        this.player = player;
+    }
 }
