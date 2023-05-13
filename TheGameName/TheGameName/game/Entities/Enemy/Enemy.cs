@@ -17,6 +17,7 @@ public class Enemy : IGameEntity, ICanAttack
 
     private float rotation;
     private double attackDelayTimer;
+    private ProgressBar healthBar;
 
     public Order UpdateOrder { get; private set; } = Order.Enemy;
     public Order DrawOrder { get; private set; } = Order.Enemy;
@@ -31,33 +32,37 @@ public class Enemy : IGameEntity, ICanAttack
     public Player Player { get; private set; }
     public int AttackCounter { get; private set; } = MAGAZINE_SIZE;
     public double AttackDelayTimer { get; private set; }
+    public float Scale { get; private set; }
 
 
-    public Enemy(Vector2 position, Texture2D texture, Player player)
+    public Enemy(Vector2 position, Texture2D texture, Player player, double health, float scale)
     {
         Position = position;
         Texture = texture;
-        this.Player = player;
+        Player = player;
         Rectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
+        Health = health;
     }
 
     public void Update(GameTime gameTime)
     {
         if (!Move()) Attack(gameTime);
         Rectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
+        healthBar.Update(Health);
     }
 
     public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
     {
         spriteBatch.Draw(Texture, Position, null, Color.Aqua, rotation,
             new Vector2(Texture.Width / 2, Texture.Height / 2), 1.0f, SpriteEffects.None, 0f);
+        healthBar.Draw(spriteBatch, gameTime);
     }
 
     public bool Move()
     {
         var pathFinder = new EnemyMovementAI();
         var nextTile = pathFinder.FindPath(Globals.tileMap, Position, Player.Position);
-        
+        if (nextTile == null) return true;
         var directionToNextTile = MathOperations.GetDirectionToPoint(Position.ToPoint(), nextTile.Rectangle.Center);
         var angleToNextTile = MathOperations.GetAngleBetweenPoints(Position.ToPoint(), nextTile.Rectangle.Center);
         directionToNextTile.Normalize();
@@ -68,7 +73,7 @@ public class Enemy : IGameEntity, ICanAttack
         directionToPlayer.Normalize();
         if (distanceToPlayer <= ATTACK_DISTANCE && 
             Globals.tileMap.GetTilesOnDirection(Position, Player.Position)
-            .Where(tile=>tile.Collision != TileCollision.Walkable)
+            .Where(tile=>tile.Collision == TileCollision.Impassable)
             .Count() == 0)
         {
             rotation = angleToPlayer;
@@ -108,5 +113,11 @@ public class Enemy : IGameEntity, ICanAttack
     public void Collide(IGameEntity entity, IGameEntity entityToIntersect)
     {
        
+    }
+
+    public void SetHealthBar(ProgressBar healthBar)
+    {
+        this.healthBar = healthBar;
+        Health = healthBar.MaxValue;
     }
 }

@@ -17,24 +17,25 @@ public class Player : IGameEntity, ICanAttack
     private const double ATTACK_RATE = 100;
 
     private readonly RenderStateController renderStateController = new RenderStateController();
+    private readonly ProgressBar shootingBar;
 
-    private float Speed { get; set; } = 2;
-    public double Health { get; set; } = 10;
-    public Vector2 Position { get; set; }
-    public Order UpdateOrder { get; set; } = Order.Player;
-    public Order DrawOrder { get; set; } = Order.Player;
+    public float Speed { get; private   set; } = 2;
+    public double Health { get; private set; } = 50;
+    public Vector2 Position { get; private set; }
+    public Order UpdateOrder { get; private set; } = Order.Player;
+    public Order DrawOrder { get; private set; } = Order.Player;
     public string CurrentState { get; private set; } = nameof(PlayerTextureContainer.WalkUp);
-    public double Damage { get; set; }
-    public bool IsAlive { get; set; } = true;
-    public Rectangle Rectangle { get; set; }
-    public EntityType Type { get; set; } = EntityType.Player;
-    public int AttackCounter { get; set; } = MAGAZINE_SIZE;
+    public double Damage { get; private set; }
+    public bool IsAlive { get; private set; } = true;
+    public Rectangle Rectangle { get; private set; }
+    public EntityType Type { get; private set; } = EntityType.Player;
+    public int AttackCounter { get; private set; } = MAGAZINE_SIZE;
     public double AttackDelayTimer { get; set; }
 
     public Texture2D bulletTexture;
 
 
-    public Player(TheGameName game, PlayerTextureContainer textureContainer, Vector2 position)
+    public Player(PlayerTextureContainer textureContainer, Vector2 position, double health, ProgressBar shootingBar)
     {
         Position = position;
         renderStateController.AddState(nameof(PlayerTextureContainer.WalkDown),
@@ -55,28 +56,22 @@ public class Player : IGameEntity, ICanAttack
         renderStateController.AddState(nameof(PlayerTextureContainer.WalkLeft),
             new SpriteAnimation(textureContainer.WalkLeft, WALK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT));
 
-        /*        var attackAnimation = new SpriteAnimation(textureContainer.Attack,
-                    ATTACK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT)
-                { Fps = ATTACK_ANIM_FPS};
-                attackAnimation.AnimationCompleted += Attack_AnimationCompleted;
-                renderStateController.AddState(nameof(PlayerTextureContainer.Attack), attackAnimation);*/
         Rectangle = new Rectangle((int)Position.X, (int)Position.Y, SPRITE_WIDTH, SPRITE_HEIGHT);
+        Health = health;
+        this.shootingBar = new ProgressBar(shootingBar.Background, shootingBar.Foreground, AttackCounter, Position + new Vector2(-SPRITE_WIDTH / 4, -SPRITE_HEIGHT / 2), this);
     }
-
-    /*    private void Attack_AnimationCompleted(object sender, AnimationCompletedEventArgs e)
-        {
-            renderStateController.SetState(nameof(PlayerTextureContainer.Idle));
-        }*/
 
     public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
     {
         renderStateController.Draw(spriteBatch, Position, SpriteEffects.None);
+        shootingBar.Draw(spriteBatch, gameTime);
     }
 
     public void Update(GameTime gameTime)
     {
         renderStateController.Update(gameTime);
         Rectangle = new Rectangle((int)Position.X, (int)Position.Y, SPRITE_WIDTH, SPRITE_HEIGHT);
+        shootingBar.Update(AttackCounter);
     }
 
     public void Move(Vector2 direction, string state)

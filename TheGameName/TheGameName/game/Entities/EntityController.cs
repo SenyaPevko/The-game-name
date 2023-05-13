@@ -12,7 +12,7 @@ public class EntityController : IUpdatable
 {
     private readonly List<IGameEntity> gameEntities = new List<IGameEntity>();
     private readonly List<IGameEntity> entitiesToAdd = new List<IGameEntity>();
-    private readonly List<IGameEntity> entitiesToRemove = new List<IGameEntity>();
+    private readonly HashSet<IGameEntity> entitiesToRemove = new HashSet<IGameEntity>();
 
     public EntityController()
     {
@@ -33,7 +33,7 @@ public class EntityController : IUpdatable
     public bool RemoveEntity(IGameEntity entity)
     {
         if (entity is null) throw new ArgumentNullException("U're trying to remove an empty entity");
-        if (HasEntity(entity)) return false;
+        if (entitiesToRemove.Contains(entity)) return false;
         entitiesToRemove.Add(entity);
         return true;
     }

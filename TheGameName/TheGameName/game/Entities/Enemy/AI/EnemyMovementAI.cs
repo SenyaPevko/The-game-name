@@ -56,6 +56,7 @@ public class EnemyMovementAI
             endTile = track[endTile].Previous;
         }
         result.Reverse();
+        if (result.Count == 1) return result[0];
         return result[1];
     }
 }

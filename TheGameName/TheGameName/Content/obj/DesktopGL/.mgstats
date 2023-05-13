@@ -1,2 +1,2 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
-"D:/@wee/TheGameName/The-game-name/TheGameName/TheGameName/Content/Tiles/tileset2.png","D:/@wee/TheGameName/The-game-name/TheGameName/TheGameName/Content/bin/DesktopGL/Tiles/tileset2.xnb","TextureProcessor","Texture2DContent",4792,83029,0,2148752
+"D:/@wee/TheGameName/The-game-name/TheGameName/TheGameName/Content/Enemy/slug_boss.png","D:/@wee/TheGameName/The-game-name/TheGameName/TheGameName/Content/bin/DesktopGL/Enemy/slug_boss.xnb","TextureProcessor","Texture2DContent",1216,11749,0,2263745

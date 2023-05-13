@@ -15,8 +15,8 @@ using System.Runtime.CompilerServices;
 public class TileMap
 {
     private Rectangle[] tilesBoundsInTileset;
-    private int mapWidth;
-    private int mapHeight;
+    public int MapWidth { get; private set; }
+    public int MapHeight { get; private set; }
     private Texture2D tilesetTexture;
     public Tile[,] Map { get; private set; }
     public int TileWidth { get; private set; }
@@ -44,8 +44,8 @@ public class TileMap
         TileHeight = 64;
         ParseTileset();
 
-        mapWidth = int.Parse(data[2].Split(", ")[0]);
-        mapHeight = int.Parse(data[2].Split(", ")[1]);
+        MapWidth = int.Parse(data[2].Split(' ')[0]);
+        MapHeight = int.Parse(data[2].Split(' ')[1]);
         FillMap();
     }
 
@@ -67,11 +67,11 @@ public class TileMap
 
     public void FillMap()
     {
-        Map = new Tile[mapWidth, mapHeight];
-        for (int column = 0; column < mapWidth; column++)
+        Map = new Tile[MapWidth, MapHeight];
+        for (int column = 0; column < MapWidth; column++)
         {
-            var tileIndexes = data[3 + column].Trim().Split(", ");
-            for (int row = 0; row < mapHeight; row++)
+            var tileIndexes = data[3 + column].Trim().Split(' ');
+            for (int row = 0; row < MapHeight; row++)
             {
                 var tileIndex = int.Parse(tileIndexes[row]);
                 var tilePosition = new Vector2(row * TileWidth, column * TileHeight);
@@ -86,9 +86,9 @@ public class TileMap
 
     public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
     {
-        for (int column = 0; column < mapWidth; column++)
+        for (int column = 0; column < MapWidth; column++)
         {
-            for (int row = 0; row < mapHeight; row++)
+            for (int row = 0; row < MapHeight; row++)
             {
                 Map[column, row].Draw(spriteBatch, gameTime);
             }
@@ -119,7 +119,7 @@ public class TileMap
                 {
                     var neighborRow = tileRow + dx;
                     var neighborColumn = tileColumn + dy;
-                    if(neighborRow>-1 && neighborRow<mapWidth && neighborColumn > -1 && neighborColumn < mapHeight)
+                    if(neighborRow>-1 && neighborRow<MapWidth && neighborColumn > -1 && neighborColumn < MapHeight)
                         yield return Map[tileRow + dx, tileColumn + dy];
                 }
     }
@@ -142,7 +142,7 @@ public class TileMap
 
     public List<Tile> ToList()
     {
-        var tiles = new List<Tile>(mapWidth * mapHeight);
+        var tiles = new List<Tile>(MapWidth * MapHeight);
         foreach (var tile in Map) tiles.Add(tile);
         return tiles;
     }

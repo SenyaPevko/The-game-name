@@ -17,16 +17,17 @@ namespace TheGameName
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        private ProgressBar playerHealthBar;
+        private ProgressBar playerShootingBar;
+        private double playerHealth = 20;
         private Player player;
+        private Vector2 playerSpawnPosition = new Vector2(520, 920);
         private PlayerController playerController;
         private PlayerTextureContainer playerTextureContainer;
         private Camera camera;
         private EnemySpawner enemySpawner;
         private SpriteFont font;
         private bool hasGameStarted = true;
-
-
-        private Texture2D background;
 
         public TheGameName()
         {
@@ -49,31 +50,44 @@ namespace TheGameName
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            Globals.graphicsDevice = GraphicsDevice;
             Globals.entityController = new EntityController();
 
-            var mapData = File.ReadAllText($"{Content.RootDirectory}/map.txt");
+            var mapData = File.ReadAllText($"{Content.RootDirectory}/map2.txt");
             Globals.tileMap = new TileMap(mapData, Content);
             Globals.tileMap.BuildMap();
 
-            Texture2D cursorTexture = Content.Load<Texture2D>("Cursor/cursor");
-            Texture2D bulletTexture = Content.Load<Texture2D>("bullet/bullet");
-            Texture2D bg = Content.Load<Texture2D>("toTest/bg");
-            background = bg;
+            var walkUpTexture = Content.Load<Texture2D>("Player/up");
+            var walkUpLeftTexture = Content.Load<Texture2D>("Player/up-left");
+            var walkUpRightTexture = Content.Load<Texture2D>("Player/up-right");
+            var walkDownTexture = Content.Load<Texture2D>("Player/down");
+            var walkDownLeftTexture = Content.Load<Texture2D>("Player/down-left");
+            var walkDownRightTexture = Content.Load<Texture2D>("Player/down-right");
+            var walkLeftTexture = Content.Load<Texture2D>("Player/left");
+            var walkRightTexture = Content.Load<Texture2D>("Player/right");
+            
+            var cursorTexture = Content.Load<Texture2D>("Cursor/cursor");
+            var bulletTexture = Content.Load<Texture2D>("bullet/bullet");
+            
+            var playerHealthBarBg = Content.Load<Texture2D>("Bars/HealthBar_Player_Dying");
+            var playerHealthBarFg = Content.Load<Texture2D>("Bars/HealthBar_Player_Alive");
+            var playerShootingBarFg = Content.Load<Texture2D>("Bars/ShootingBar_Fg");
+            var playerShootingBarBg = Content.Load<Texture2D>("Bars/ShootingBar_Bg");
+            
+            var enemyHealthBarFg = Content.Load<Texture2D>("Bars/HealthBar_Enemy_Fg");
+            var enemyHealthBarBg = Content.Load<Texture2D>("Bars/HealthBar_Enemy_Bg");
 
-            Texture2D walkUpTexture = Content.Load<Texture2D>("Player/up");
-            Texture2D walkUpLeftTexture = Content.Load<Texture2D>("Player/up-left");
-            Texture2D walkUpRightTexture = Content.Load<Texture2D>("Player/up-right");
-            Texture2D walkDownTexture = Content.Load<Texture2D>("Player/down");
-            Texture2D walkDownLeftTexture = Content.Load<Texture2D>("Player/down-left");
-            Texture2D walkDownRightTexture = Content.Load<Texture2D>("Player/down-right");
-            Texture2D walkLeftTexture = Content.Load<Texture2D>("Player/left");
-            Texture2D walkRightTexture = Content.Load<Texture2D>("Player/right");
-            Texture2D enemyTexture = Content.Load<Texture2D>("Enemy/test");
+            var enemyMinionTexture = Content.Load<Texture2D>("Enemy/test");
+            var enemyBossTexture = Content.Load<Texture2D>("Enemy/slug_boss");
+            var enemySpawnerTexture = Content.Load<Texture2D>("Enemy/EnemySpawner");
+
+            var enemyTextureContainer = new EnemyTextureContainer
+            {
+                Minion = enemyMinionTexture,
+                Boss = enemyBossTexture
+            };
 
             font = Content.Load<SpriteFont>("font");
-
-            //Texture2D attackTexture = Content.Load<Texture2D>("Player/attack");
 
             PlayerTextureContainer container = new PlayerTextureContainer
             {
@@ -87,15 +101,17 @@ namespace TheGameName
                 WalkRight = walkRightTexture
             };
             playerTextureContainer = container;
-
-            player = new Player(this, container, new Vector2(100, 200));
-
+            playerShootingBar = new ProgressBar(playerShootingBarBg, playerShootingBarFg, 0, Vector2.Zero, null);
+            player = new Player(container, playerSpawnPosition, playerHealth, playerShootingBar);
+            camera = new Camera(player);
+            playerHealthBar = new ProgressBar(playerHealthBarBg, playerHealthBarFg, playerHealth, 
+                camera.Position - new Vector2(Globals.screenWidth/2, Globals.screenHeight/2), camera);
             Globals.entityController.AddEntity(player);
             playerController = new PlayerController(player);
-            camera = new Camera(player);
-            Globals.cursor = new Cursor(cursorTexture);
+            Globals.cursor = new Cursor(cursorTexture, camera);
             Globals.bulletsContoller = new BulletsContoller(bulletTexture);
-            enemySpawner = new EnemySpawner(enemyTexture, new Vector2(100, 200), player);
+            enemySpawner = new EnemySpawner(enemySpawnerTexture, enemyTextureContainer, new Vector2(128, 128), player, enemyHealthBarFg, enemyHealthBarBg);
+            Globals.entityController.AddEntity(enemySpawner);
         }
 
         protected override void Update(GameTime gameTime)
@@ -113,8 +129,8 @@ namespace TheGameName
             Globals.entityController.Update(gameTime);
             playerController.Update(gameTime);
             camera.Update(gameTime);
+            playerHealthBar.Update(player.Health);
             Globals.cursor.Update(gameTime);
-            enemySpawner.SpawnEnemy(gameTime);
             if (!player.IsAlive)
             {
                 Restart();
@@ -123,31 +139,41 @@ namespace TheGameName
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Wheat);
+            GraphicsDevice.Clear(Color.Black);
 
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
 
+            if (!hasGameStarted)
+            {
+                _spriteBatch.Begin();
+                _spriteBatch.DrawString(font, "You're dead\nPress Enter to revive", 
+                    new Vector2(Globals.screenWidth / 2, Globals.screenHeight / 2), Color.Red);
+                _spriteBatch.End();
+                return;
+            }
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null,
-                  camera.get_transformation(GraphicsDevice));
-            _spriteBatch.Draw(background, new Rectangle(0, 0, Globals.screenWidth, Globals.screenHeight), Color.White);
+                  camera.GetTransforamtion(GraphicsDevice));
 
             Globals.tileMap.Draw(_spriteBatch, gameTime);
-
             Globals.entityController.Draw(_spriteBatch, gameTime);
+            playerHealthBar.Draw(_spriteBatch, gameTime);
             Globals.cursor.Draw(_spriteBatch, gameTime);
             _spriteBatch.End();
         }
 
         public void Restart()
         {
-            player = new Player(this, playerTextureContainer, new Vector2(100, 200));
+            player = new Player(playerTextureContainer, playerSpawnPosition, playerHealth, playerShootingBar);
             hasGameStarted = false;
             Globals.entityController.AddEntity(player);
             playerController = new PlayerController(player);
             camera = new Camera(player);
+            enemySpawner.Restart();
             enemySpawner.ChangeTarget(player);
+            playerHealthBar = new ProgressBar(playerHealthBar.Background, playerHealthBar.Foreground, playerHealth,
+                camera.Position - new Vector2(Globals.screenWidth / 2, Globals.screenHeight / 2), camera);
         }
     }
 }
