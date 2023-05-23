@@ -12,21 +12,19 @@ namespace TheGameName;
 public class EnemySpawner: IGameEntity
 {
     private List<IGameEntity> spawnedEnemies = new List<IGameEntity>();
-    private double enemySpawnedAmount;
     private EnemyTextureContainer textureContainer;
     private Player player;
-    private double enemySpawnRate = 5000;
+    private double enemySpawnRate = 7000;
     private double enemySpawnTimer;
-    private double enemyBossSpawnRate = 6000;
+    private double enemyBossSpawnRate = 40000;
     private double enemyBossSpawnTimer;
-    private int enemyAllowedAmount = 10;
     private ProgressBar healthBar;
 
     public Vector2 Position { get; private set; }
-    public Order UpdateOrder => Order.Enemy;
-    public Order DrawOrder => Order.Enemy;
+    public UpdateOrder UpdateOrder => UpdateOrder.Enemy;
+    public DrawOrder DrawOrder => DrawOrder.Enemy;
     public double Health { get; private set; } = 1000;
-    public double Damage { get; private set; } = 0;
+    public double Damage { get; private set; } = 0.01;
     public bool IsAlive { get; private set; } = true;
     public Rectangle Rectangle { get; private set; }
     public EntityType Type => EntityType.Enemy;
@@ -37,7 +35,6 @@ public class EnemySpawner: IGameEntity
         this.textureContainer = textureContainer;
         Position = position;
         this.player = player;
-        enemySpawnedAmount = 0;
         healthBar = new ProgressBar(healthBarBg, healthBarFg, Health, Position, this);
         Texture = texture;
         Rectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
@@ -51,12 +48,13 @@ public class EnemySpawner: IGameEntity
 
     public void SpawnEnemy(GameTime gameTime)
     {
-        if (spawnedEnemies.Count >= enemyAllowedAmount) return;
+        
         enemyBossSpawnTimer += gameTime.ElapsedGameTime.Milliseconds;
         if (enemyBossSpawnRate < enemyBossSpawnTimer)
         {
-            var enemyBoss = new Enemy(Position, textureContainer.Boss, player, 100, 1);
-            var bossHealthBar = new ProgressBar(this.healthBar.Background, this.healthBar.Foreground, 100,
+            enemyBossSpawnTimer = gameTime.ElapsedGameTime.Milliseconds;
+            var enemyBoss = new Enemy(Position, textureContainer.Boss, player, 100);
+            var bossHealthBar = new ProgressBar(healthBar.Background, healthBar.Foreground, 100,
                 Position + new Vector2(-textureContainer.Boss.Width / 4, -textureContainer.Boss.Height / 2), enemyBoss);
             enemyBoss.SetHealthBar(bossHealthBar);
             Globals.entityController.AddEntity(enemyBoss);
@@ -66,13 +64,12 @@ public class EnemySpawner: IGameEntity
         if (enemySpawnRate < enemySpawnTimer)
         {
             enemySpawnTimer = gameTime.ElapsedGameTime.Milliseconds;
-            var enemy = new Enemy(Position, textureContainer.Minion, player, 8, 1);
+            var enemy = new Enemy(Position, textureContainer.Minion, player, 12);
             var healthBar = new ProgressBar(this.healthBar.Background, this.healthBar.Foreground, 8, 
                 Position + new Vector2(-textureContainer.Minion.Width/4,-textureContainer.Minion.Height/2), enemy);
             enemy.SetHealthBar(healthBar);
             Globals.entityController.AddEntity(enemy);
             spawnedEnemies.Add(enemy);
-            enemySpawnedAmount++;
         }
     }
 
@@ -84,7 +81,6 @@ public class EnemySpawner: IGameEntity
     public void Restart()
     {
         enemySpawnTimer = 0;
-        enemySpawnedAmount = 0;
         foreach(var enemy in spawnedEnemies) 
             Globals.entityController.RemoveEntity(enemy);
         spawnedEnemies.Clear();
@@ -92,7 +88,7 @@ public class EnemySpawner: IGameEntity
 
     public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
     {
-        spriteBatch.Draw(Texture, Position, null, Color.Aqua, 0,
+        spriteBatch.Draw(Texture, Position, null, Color.White, 0,
             new Vector2(Texture.Width / 2, Texture.Height / 2), 1.0f, SpriteEffects.None, 0f);
         healthBar.Draw(spriteBatch, gameTime);
     }
@@ -105,6 +101,9 @@ public class EnemySpawner: IGameEntity
 
     public void Collide(IGameEntity entity, IGameEntity entityToIntersect)
     {
-        
+        if(entityToIntersect.Type == EntityType.Player)
+        {
+            entityToIntersect.TakeDamage(Damage);
+        }
     }
 }

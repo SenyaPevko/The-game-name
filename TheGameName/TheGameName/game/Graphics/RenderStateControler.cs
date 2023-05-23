@@ -39,9 +39,9 @@ public class RenderStateController: IUpdatable
             CurrentState = null;
     }
 
-    public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects)
+    public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects, float opacity, Color color)
     {
-        CurrentState.Animation.Draw(spriteBatch, position, spriteEffects);
+        CurrentState.Animation.Draw(spriteBatch, position, spriteEffects, opacity, color);
     }
 
     public void Update(GameTime gameTime)

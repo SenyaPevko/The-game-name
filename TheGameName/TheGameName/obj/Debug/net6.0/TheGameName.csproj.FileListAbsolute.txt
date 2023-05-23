@@ -61,3 +61,13 @@ D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Conte
 D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Bars\ShootingBar_Bg.xnb
 D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Bars\ShootingBar_Fg.xnb
 D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Enemy\slug_boss.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Screens\StartScreen.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Drop\health.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Portal\PortalStage0.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Drop\energy.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\inventory\energy.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Portal\PortalBar_Bg.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Portal\PortalBar_Fg.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Portal\PortalStage1.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Portal\PortalStage2.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Portal\EnergyMessage.xnb

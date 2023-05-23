@@ -18,8 +18,8 @@ public class Bullet : IGameEntity
     public Vector2 Scale { get; private set; }
     public Vector2 Position { get; private set; }
     public Rectangle Rectangle { get; private set; }
-    public Order UpdateOrder { get; private set; } = Order.Bullet;
-    public Order DrawOrder { get; private set; } = Order.Bullet;
+    public UpdateOrder UpdateOrder { get; private set; } = UpdateOrder.Bullet;
+    public DrawOrder DrawOrder { get; private set; } = DrawOrder.Bullet;
     public double Health { get; private set; } = 1;
     public double Damage { get; private set; } = 2;
     public bool IsAlive { get; private set; } = true;
@@ -50,6 +50,8 @@ public class Bullet : IGameEntity
 
     public void Collide(IGameEntity entity, IGameEntity entityToIntersect)
     {
+        if (entityToIntersect.Type == EntityType.Drop || 
+            entityToIntersect.Type == EntityType.Portal) return;
         if (entity.Type == EntityType.Bullet && entityToIntersect.Type == EntityType.Tile)
         {
             var tile = (Tile)entityToIntersect;
@@ -58,6 +60,8 @@ public class Bullet : IGameEntity
         }
         else if (entity.Type == EntityType.Bullet && ((Bullet)entity).Sender.Type != entityToIntersect.Type)
         {
+            if (entityToIntersect.Type == EntityType.Player && ((Player)entityToIntersect).IsDodging) 
+                return;
             entityToIntersect.TakeDamage(entity.Damage);
             IsAlive = false;
         }

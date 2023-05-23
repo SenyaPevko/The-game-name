@@ -51,10 +51,10 @@ public class SpriteAnimation : IUpdatable, IAnimation
         }
     }
 
-    public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects)
+    public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects, float opacity, Color color)
     {
         var drawRect = new Rectangle(CurrentOffset * SpriteWidth, 0, SpriteWidth, SpriteHeight);
-        spriteBatch.Draw(Texture, new Rectangle(position.ToPoint(), new Point(SpriteWidth, SpriteHeight)), drawRect, Color.White, 0, SpriteOrigin, spriteEffects, 0);
+        spriteBatch.Draw(Texture, new Rectangle(position.ToPoint(), new Point(SpriteWidth, SpriteHeight)), drawRect, color * opacity, 0, SpriteOrigin, spriteEffects, 0);
     }
 
     public void Play()

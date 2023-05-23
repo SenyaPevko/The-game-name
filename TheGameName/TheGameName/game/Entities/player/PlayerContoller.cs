@@ -65,9 +65,17 @@ public class PlayerController : IUpdatable
         {
             player.AttackDelayTimer = 0;
         }
-        if (currentKeyboardState.IsKeyDown(Keys.C))
+        if (currentKeyboardState.IsKeyDown(Keys.R))
         {
             player.Reload(gameTime);
+        }
+        if (currentKeyboardState.IsKeyDown(Keys.Q))
+        {
+            player.DropEnergy(1);
+        }
+        if (currentKeyboardState.IsKeyDown(Keys.LeftShift))
+        {
+            player.Dodge(gameTime);
         }
     }
 }

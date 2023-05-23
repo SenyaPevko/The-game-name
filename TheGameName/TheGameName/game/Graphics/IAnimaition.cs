@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace TheGameName;
 public interface IAnimation
 {
-    void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects);
+    void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects, float opacity, Color color);
     void Update(GameTime gameTime);
 
     void Stop();

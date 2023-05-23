@@ -6,18 +6,10 @@ using Microsoft.Xna.Framework.Input;
 
 namespace TheGameName;
 
-public enum EntityType
-{
-    Player,
-    Enemy,
-    Bullet,
-    Tile
-}
-
 public interface IGameEntity: IUpdatable
 {
-    Order UpdateOrder { get; }
-    Order DrawOrder { get; }
+    UpdateOrder UpdateOrder { get; }
+    DrawOrder DrawOrder { get; }
 
     public double Health { get;}
 

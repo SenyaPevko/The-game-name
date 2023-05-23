@@ -18,12 +18,19 @@ public class Player : IGameEntity, ICanAttack
 
     private readonly RenderStateController renderStateController = new RenderStateController();
     private readonly ProgressBar shootingBar;
-
+    private double damageRate = 5000;
+    private double damageTimer;
+    private double maxHealth;
+    private double dodgeRate = 3000;
+    private double dodgeTimer = 3001;
+    private double dodgingTime = 700;
+    public bool IsDodging { get; private set; }
+    
     public float Speed { get; private   set; } = 2;
-    public double Health { get; private set; } = 50;
+    public double Health { get; private set; }
     public Vector2 Position { get; private set; }
-    public Order UpdateOrder { get; private set; } = Order.Player;
-    public Order DrawOrder { get; private set; } = Order.Player;
+    public UpdateOrder UpdateOrder { get; private set; } = UpdateOrder.Player;
+    public DrawOrder DrawOrder { get; private set; } = DrawOrder.Player;
     public string CurrentState { get; private set; } = nameof(PlayerTextureContainer.WalkUp);
     public double Damage { get; private set; }
     public bool IsAlive { get; private set; } = true;
@@ -31,8 +38,9 @@ public class Player : IGameEntity, ICanAttack
     public EntityType Type { get; private set; } = EntityType.Player;
     public int AttackCounter { get; private set; } = MAGAZINE_SIZE;
     public double AttackDelayTimer { get; set; }
-
-    public Texture2D bulletTexture;
+    public float TextureOpacity { get; private set; } = 1;
+    public Color Color { get; private set; }
+    public Vector2 CurrentDirection { get; private set; }
 
 
     public Player(PlayerTextureContainer textureContainer, Vector2 position, double health, ProgressBar shootingBar)
@@ -58,12 +66,15 @@ public class Player : IGameEntity, ICanAttack
 
         Rectangle = new Rectangle((int)Position.X, (int)Position.Y, SPRITE_WIDTH, SPRITE_HEIGHT);
         Health = health;
+        maxHealth = health;
+        IsDodging = false;
+        Color = Color.White;
         this.shootingBar = new ProgressBar(shootingBar.Background, shootingBar.Foreground, AttackCounter, Position + new Vector2(-SPRITE_WIDTH / 4, -SPRITE_HEIGHT / 2), this);
     }
 
     public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
     {
-        renderStateController.Draw(spriteBatch, Position, SpriteEffects.None);
+        renderStateController.Draw(spriteBatch, Position, SpriteEffects.None, TextureOpacity, Color);
         shootingBar.Draw(spriteBatch, gameTime);
     }
 
@@ -72,10 +83,18 @@ public class Player : IGameEntity, ICanAttack
         renderStateController.Update(gameTime);
         Rectangle = new Rectangle((int)Position.X, (int)Position.Y, SPRITE_WIDTH, SPRITE_HEIGHT);
         shootingBar.Update(AttackCounter);
+        damageTimer += gameTime.ElapsedGameTime.Milliseconds;
+        if (damageRate < damageTimer)
+        {
+            damageTimer = gameTime.ElapsedGameTime.Milliseconds; ;
+            TakeDamage(Globals.tileMap.LevelDamage);
+        }
+        StopDodging(gameTime);
     }
 
     public void Move(Vector2 direction, string state)
     {
+        CurrentDirection = direction;
         CurrentState = state;
         renderStateController.SetState(state);
         renderStateController.CurrentState.Animation.Play();
@@ -129,5 +148,44 @@ public class Player : IGameEntity, ICanAttack
             if (tile.Collision == TileCollision.Attackable)
                 TakeDamage(tile.Damage);
         }
+    }
+
+    public void Heal(double health)
+    {
+        if (health + Health > maxHealth) Health = maxHealth;
+        else Health += health;
+    }
+
+    public void Dodge(GameTime gameTime)
+    {
+        dodgeTimer += gameTime.ElapsedGameTime.Milliseconds;
+        if (dodgeTimer > dodgeRate)
+        {
+            IsDodging = true;
+            TextureOpacity = 0.8f;
+            dodgeTimer = 0;
+            Speed *= 2;
+            Color = Color.SlateGray;
+        }
+    }
+
+    public void StopDodging(GameTime gameTime)
+    {
+        dodgeTimer += gameTime.ElapsedGameTime.Milliseconds;
+        if (!IsDodging) return;
+
+        if (dodgingTime < dodgeTimer)
+        {
+            IsDodging = false;
+            TextureOpacity = 1;
+            Speed = 2;
+            Color = Color.White;
+        }   
+    }
+
+    public void DropEnergy(int amount)
+    {
+        if(Globals.inventory.DecreaseAmountOfItem(DropType.Energy,amount))
+            Globals.dropSpawner.Spawn(Position+CurrentDirection*new Vector2(SPRITE_WIDTH+5, SPRITE_HEIGHT+5), DropType.Energy, 1);
     }
 }

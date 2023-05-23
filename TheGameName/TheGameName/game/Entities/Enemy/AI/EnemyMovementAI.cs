@@ -11,10 +11,9 @@ namespace TheGameName;
 
 public class EnemyMovementAI
 {
-    class DijkstraData
+    public EnemyMovementAI()
     {
-        public Tile Previous { get; set; }
-        public double Price { get; set; }
+        
     }
 
     public Tile FindPath(TileMap map, Vector2 startPosition, Vector2 targetPosition)
@@ -59,4 +58,10 @@ public class EnemyMovementAI
         if (result.Count == 1) return result[0];
         return result[1];
     }
+}
+
+class DijkstraData
+{
+    public Tile Previous { get; set; }
+    public double Price { get; set; }
 }

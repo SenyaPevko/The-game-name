@@ -21,9 +21,9 @@ public class RenderState
         Animation = animation;
     }
 
-    public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects)
+    public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects, float opacity, Color color)
     {
-        Animation?.Draw(spriteBatch, position, spriteEffects);
+        Animation?.Draw(spriteBatch, position, spriteEffects, opacity, color);
     }
 
 }

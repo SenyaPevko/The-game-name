@@ -34,7 +34,7 @@ public class EntityController : IUpdatable
     {
         if (entity is null) throw new ArgumentNullException("U're trying to remove an empty entity");
         if (entitiesToRemove.Contains(entity)) return false;
-        entitiesToRemove.Add(entity);
+        gameEntities.Remove(entity);
         return true;
     }
 
@@ -43,12 +43,10 @@ public class EntityController : IUpdatable
         foreach (var entity in gameEntities.OrderBy(entity => entity.UpdateOrder))
         {
             // entities with tiles collision
-            foreach (Tile tile in Globals.tileMap)
+            var tileToCollide = Globals.tileMap.GetTileByVectorPosition(entity.Position); 
+            if (tileToCollide != null && Collide(tileToCollide.Rectangle, entity.Rectangle))
             {
-                if (Collide(tile.Rectangle, entity.Rectangle))
-                {
-                    entity.Collide(entity, tile);
-                }
+                entity.Collide(entity, tileToCollide);
             }
 
             foreach (var entityToIntersect in gameEntities)
@@ -64,7 +62,7 @@ public class EntityController : IUpdatable
             
             if (entity.IsAlive)
                 entity.Update(gameTime);
-            else entitiesToRemove.Add(entity);
+            else gameEntities.Remove(entity);
         }
 
         foreach (var entity in entitiesToAdd)

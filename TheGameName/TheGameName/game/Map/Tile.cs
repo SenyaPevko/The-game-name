@@ -18,8 +18,8 @@ public class Tile: IGameEntity
 {
     public Texture2D Texture { get; private set; }
     public TileCollision Collision { get; private set; }
-    public Order UpdateOrder { get; private set; } = Order.Tile;
-    public Order DrawOrder { get; private set; } = Order.Tile;
+    public UpdateOrder UpdateOrder { get; private set; } = UpdateOrder.Tile;
+    public DrawOrder DrawOrder { get; private set; } = DrawOrder.Tile;
     public Rectangle Rectangle { get; private set; }
     public Vector2 Position { get; private set; }
     public double Health { get; private set; } = 100;

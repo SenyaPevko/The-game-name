@@ -15,20 +15,23 @@ using System.Runtime.CompilerServices;
 public class TileMap
 {
     private Rectangle[] tilesBoundsInTileset;
-    public int MapWidth { get; private set; }
-    public int MapHeight { get; private set; }
-    private Texture2D tilesetTexture;
-    public Tile[,] Map { get; private set; }
-    public int TileWidth { get; private set; }
-    public int TileHeight { get; private set; }
     private string[] data;
-    private Dictionary<int, TileCollision> TileCollisionByIndex = new Dictionary<int, TileCollision>() 
+    private Texture2D tilesetTexture;
+    private Dictionary<int, TileCollision> TileCollisionByIndex = new Dictionary<int, TileCollision>()
     {
         {1, TileCollision.Walkable },
         {2, TileCollision.Walkable },
         {3, TileCollision.Impassable },
         {4, TileCollision.Passable }
     };
+
+    public int MapWidth { get; private set; }
+    public int MapHeight { get; private set; }
+    public Tile[,] Map { get; private set; }
+    public int TileWidth { get; private set; }
+    public int TileHeight { get; private set; }
+    public double LevelDamage { get; private set; } = 1;
+
 
     public TileMap(string data, ContentManager contentManager)
     {
@@ -104,6 +107,7 @@ public class TileMap
 
     public Tile GetTileByVectorPosition(Vector2 position)
     {
+        if(!InBounds(position)) return null;
         return Map[(int)(position.Y / TileHeight),
            (int)(position.X / TileWidth)];
     }
@@ -151,4 +155,11 @@ public class TileMap
         => tile is { X: >= 0, Y: >= 0 }
            && Map.GetLength(0)*TileWidth > tile.X + TileWidth
            && Map.GetLength(1)*TileHeight > tile.Y+TileHeight;
+
+    public bool InBounds(Vector2 position)
+    {
+        if (position.X > MapWidth * TileWidth || position.X < 0) return false;
+        if (position.Y > MapHeight * TileHeight || position.Y < 0) return false;
+        return true; 
+    }
 }
