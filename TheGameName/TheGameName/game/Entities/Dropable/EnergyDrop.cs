@@ -38,7 +38,7 @@ public class EnergyDrop : IDropable
         }
         else if (entityToIntersect.Type == EntityType.Player)
         {
-            Globals.inventory.AddAmountToItem(Drop.Type, 1);
+            TheGameName.Inventory.AddAmountToItem(Drop.Type, 1);
             TakeDamage(Health);
         }
     }

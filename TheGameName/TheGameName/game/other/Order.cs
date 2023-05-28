@@ -16,7 +16,7 @@ public enum UpdateOrder
     Drop = 2,
     Enemy = 3,
     Portal = 4,
-    Player = 5,    
+    Player = 5,
     Inventory = 6,
     Cursor = 7
 }

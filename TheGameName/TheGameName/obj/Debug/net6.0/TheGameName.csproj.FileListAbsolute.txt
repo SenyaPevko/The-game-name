@@ -71,3 +71,8 @@ D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Conte
 D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Portal\PortalStage1.xnb
 D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Portal\PortalStage2.xnb
 D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Portal\EnergyMessage.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Drop\activator.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\inventory\EnemyHead.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Portal\ActivatorsMessage.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Screens\PauseScreen.xnb
+D:\@wee\TheGameName\The-game-name\TheGameName\TheGameName\bin\Debug\net6.0\Content\Screens\EndScreen.xnb

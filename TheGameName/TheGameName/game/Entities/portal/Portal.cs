@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Transactions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using NUnit.Framework.Constraints;
 
 namespace TheGameName;
 
@@ -22,8 +24,12 @@ public class Portal : IGameEntity
     public int CurrentEnergyAmount { get; private set; }
     public int MaxEnergyAmount { get; private set; }
     public Texture2D Message { get; private set; }
+    public int ActivatorsAmount { get; private set; }
+    public int CurrentActivatorsAmount { get; private set; } = 0;
+    public bool IsActivated { get; private set; }
 
-    public Portal(PortalTextureContainer textureContainer, Vector2 position, int energyAmount)
+
+    public Portal(PortalTextureContainer textureContainer, Vector2 position, int energyAmount, int activatorsAmount)
     {
         this.textureContainer = textureContainer;
         Texture = textureContainer.Stage0;
@@ -33,14 +39,8 @@ public class Portal : IGameEntity
         MaxEnergyAmount = energyAmount;
         SetProgressBar();
         Message = Texture;
-    }
-    public void Collide(IGameEntity entity, IGameEntity entityToIntersect)
-    {
-        if (entityToIntersect.Type == EntityType.Cursor)
-        {
-            Message = textureContainer.EnergyMessage;
-        }
-        else Message = Texture;
+        ActivatorsAmount = activatorsAmount;
+        IsActivated = false;
     }
 
     public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
@@ -50,9 +50,6 @@ public class Portal : IGameEntity
         energyAmountBar.Draw(spriteBatch, gameTime);
         spriteBatch.Draw(Message, Position, null, Color.White, 0,
             new Vector2(Texture.Width / 2, Texture.Height / 2), 1.0f, SpriteEffects.None, 0f);
-        /*spriteBatch.DrawString(Globals.fontThin, 
-            $"{CurrentEnergyAmount}/{MaxEnergyAmount}", 
-            energyAmountBar.Position, Color.Black);*/
     }
 
     public void TakeDamage(double damage)
@@ -78,5 +75,40 @@ public class Portal : IGameEntity
     {
         if(CurrentEnergyAmount >= MaxEnergyAmount) return;
         CurrentEnergyAmount += energy;
+    }
+
+    public void TakeActivator(int amount)
+    {
+        if(CurrentActivatorsAmount < ActivatorsAmount)
+            CurrentActivatorsAmount += amount;
+        Activate();
+    }
+
+    public void Activate()
+    {
+        if(ActivatorsAmount >= CurrentActivatorsAmount)
+        {
+            IsActivated = true;
+        }
+    }
+
+    public void Restart()
+    {
+        CurrentActivatorsAmount = 0;
+        CurrentEnergyAmount = 0;
+        Texture = textureContainer.Stage0;
+        IsActivated = false;
+    }
+
+    public void Collide(IGameEntity entity, IGameEntity entityToIntersect)
+    {
+        if (entityToIntersect.Type == EntityType.Cursor)
+        {
+            if (CurrentEnergyAmount < MaxEnergyAmount)
+                Message = textureContainer.EnergyMessage;
+            else
+                Message = textureContainer.ActivatatorsMessage;
+        }
+        else Message = Texture;
     }
 }

@@ -25,16 +25,13 @@ public class SpriteAnimation : IUpdatable, IAnimation
 
     public AnimationState State { get; set; } = AnimationState.Stopped;
 
-    public event EventHandler<AnimationCompletedEventArgs> AnimationCompleted;
-
-    public SpriteAnimation(Texture2D texture, int spriteCount, int spriteWidth, int spriteHeight)
+    public SpriteAnimation(Texture2D texture, int spriteCount, int spriteWidth, int spriteHeight, Vector2 spriteOrigin)
     {
         SpritesCount = spriteCount;
         SpriteWidth = spriteWidth;
         SpriteHeight = spriteHeight;
         Texture = texture ?? throw new ArgumentNullException(nameof(texture));
-
-        SpriteOrigin = new Vector2(spriteWidth / 4f, spriteHeight / 2f);
+        SpriteOrigin = spriteOrigin;
     }
 
     public void Update(GameTime gameTime)
@@ -46,7 +43,6 @@ public class SpriteAnimation : IUpdatable, IAnimation
             if (PlaybackTime > TotalDuration)
             {
                 PlaybackTime = 0;
-                OnAnimationCompleted();
             }
         }
     }
@@ -71,12 +67,6 @@ public class SpriteAnimation : IUpdatable, IAnimation
     public void Pause()
     {
         State = AnimationState.Paused;
-    }
-
-    protected virtual void OnAnimationCompleted()
-    {
-        var handler = AnimationCompleted;
-        handler?.Invoke(this, new AnimationCompletedEventArgs());
     }
 
 }

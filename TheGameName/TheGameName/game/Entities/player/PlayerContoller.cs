@@ -71,7 +71,7 @@ public class PlayerController : IUpdatable
         }
         if (currentKeyboardState.IsKeyDown(Keys.Q))
         {
-            player.DropEnergy(1);
+            player.Drop(1);
         }
         if (currentKeyboardState.IsKeyDown(Keys.LeftShift))
         {

@@ -1,5 +1,6 @@
 ﻿public enum DropType
 {
     Health,
-    Energy
+    Energy,
+    Activator
 }

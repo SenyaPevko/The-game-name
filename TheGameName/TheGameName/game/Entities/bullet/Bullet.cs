@@ -51,7 +51,9 @@ public class Bullet : IGameEntity
     public void Collide(IGameEntity entity, IGameEntity entityToIntersect)
     {
         if (entityToIntersect.Type == EntityType.Drop || 
-            entityToIntersect.Type == EntityType.Portal) return;
+            entityToIntersect.Type == EntityType.Portal||
+            entityToIntersect.Type == EntityType.Cursor||
+            entityToIntersect.Type == EntityType.Bullet) return;
         if (entity.Type == EntityType.Bullet && entityToIntersect.Type == EntityType.Tile)
         {
             var tile = (Tile)entityToIntersect;
@@ -80,4 +82,12 @@ public class Bullet : IGameEntity
         Health -= damage;
         if (Health <= 0) IsAlive = false;
     }
+
+/*    public bool CheckIfReachedScreenEnd(Vector2 position)
+    {
+        if (position.X > TheGameName.ScreenWidth||
+            position.Y > TheGameName.ScreenHeight)
+            return true;
+        return false;
+    }*/
 }

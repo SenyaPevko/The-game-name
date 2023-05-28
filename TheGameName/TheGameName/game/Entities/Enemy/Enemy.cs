@@ -74,7 +74,7 @@ public class Enemy : IGameEntity, ICanAttack
             var findPathTask = new Task(() =>
             {
                 CurrentlyFindingPath = true;
-                var nextTile = pathFinder.FindPath(Globals.tileMap, Position, Player.Position);
+                var nextTile = pathFinder.FindPath(TheGameName.TileMap, Position, Player.Position);
                 if (nextTile == null) return;
                 var directionToNextTile = MathOperations.GetDirectionToPoint(Position.ToPoint(), nextTile.Rectangle.Center);
                 var angleToNextTile = MathOperations.GetAngleBetweenPoints(Position.ToPoint(), nextTile.Rectangle.Center);
@@ -98,7 +98,7 @@ public class Enemy : IGameEntity, ICanAttack
         if (attackDelayTimer > ATTACK_RATE)
         {
             attackDelayTimer = 0;
-            Globals.bulletsContoller.AddBulletToFired(this, Player.Position);
+            TheGameName.BulletsContoller.AddBulletToFired(this, Player.Position);
             return true;
         }
         return false;
@@ -115,8 +115,8 @@ public class Enemy : IGameEntity, ICanAttack
         if (Health <= 0) IsAlive = false;
         if (!IsAlive)
         {
-            Globals.dropSpawner.Spawn(Position + new Vector2(5,-5), DropType.Health, 1);
-            Globals.dropSpawner.Spawn(Position, DropType.Energy, 1);
+            TheGameName.DropSpawner.Spawn(Position + new Vector2(5,-5), DropType.Health, 1);
+            TheGameName.DropSpawner.Spawn(Position, DropType.Energy, 1);
         }
     }
 
@@ -148,7 +148,7 @@ public class Enemy : IGameEntity, ICanAttack
         var distanceToPlayer = directionToPlayer.Length();
         directionToPlayer.Normalize();
         if (distanceToPlayer <= ATTACK_DISTANCE &&
-            Globals.tileMap.GetTilesOnDirection(Position, Player.Position)
+            TheGameName.TileMap.GetTilesOnDirection(Position, Player.Position)
             .Where(tile => tile.Collision == TileCollision.Impassable)
             .Count() == 0)
         {

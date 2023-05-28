@@ -1,15 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TheGameName;
 
 
-public class RenderState
+public class RenderState : IUpdatable
 {
 
     public string Name { get; }
@@ -26,4 +21,8 @@ public class RenderState
         Animation?.Draw(spriteBatch, position, spriteEffects, opacity, color);
     }
 
+    public void Update(GameTime gameTime)
+    {
+        Animation?.Update(gameTime);
+    }
 }

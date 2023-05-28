@@ -15,4 +15,5 @@ public struct PortalTextureContainer
     public Texture2D BarFg { get; set; }
     public Texture2D BarBg { get; set; }
     public Texture2D EnergyMessage { get; set; }
+    public Texture2D ActivatatorsMessage { get; set; }
 }

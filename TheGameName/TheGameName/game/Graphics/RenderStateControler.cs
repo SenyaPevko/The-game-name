@@ -2,9 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TheGameName;
 
@@ -41,11 +38,11 @@ public class RenderStateController: IUpdatable
 
     public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects, float opacity, Color color)
     {
-        CurrentState.Animation.Draw(spriteBatch, position, spriteEffects, opacity, color);
+        CurrentState.Draw(spriteBatch, position, spriteEffects, opacity, color);
     }
 
     public void Update(GameTime gameTime)
     {
-        CurrentState.Animation.Update(gameTime);
+        CurrentState.Update(gameTime);
     }
 }

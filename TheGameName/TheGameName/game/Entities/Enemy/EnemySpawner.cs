@@ -23,7 +23,7 @@ public class EnemySpawner: IGameEntity
     public Vector2 Position { get; private set; }
     public UpdateOrder UpdateOrder => UpdateOrder.Enemy;
     public DrawOrder DrawOrder => DrawOrder.Enemy;
-    public double Health { get; private set; } = 1000;
+    public double Health { get; private set; } = 400;
     public double Damage { get; private set; } = 0.01;
     public bool IsAlive { get; private set; } = true;
     public Rectangle Rectangle { get; private set; }
@@ -57,7 +57,7 @@ public class EnemySpawner: IGameEntity
             var bossHealthBar = new ProgressBar(healthBar.Background, healthBar.Foreground, 100,
                 Position + new Vector2(-textureContainer.Boss.Width / 4, -textureContainer.Boss.Height / 2), enemyBoss);
             enemyBoss.SetHealthBar(bossHealthBar);
-            Globals.entityController.AddEntity(enemyBoss);
+            TheGameName.EntityController.AddEntity(enemyBoss);
             spawnedEnemies.Add(enemyBoss);
         }
         enemySpawnTimer += gameTime.ElapsedGameTime.Milliseconds;
@@ -68,7 +68,7 @@ public class EnemySpawner: IGameEntity
             var healthBar = new ProgressBar(this.healthBar.Background, this.healthBar.Foreground, 8, 
                 Position + new Vector2(-textureContainer.Minion.Width/4,-textureContainer.Minion.Height/2), enemy);
             enemy.SetHealthBar(healthBar);
-            Globals.entityController.AddEntity(enemy);
+            TheGameName.EntityController.AddEntity(enemy);
             spawnedEnemies.Add(enemy);
         }
     }
@@ -82,8 +82,10 @@ public class EnemySpawner: IGameEntity
     {
         enemySpawnTimer = 0;
         foreach(var enemy in spawnedEnemies) 
-            Globals.entityController.RemoveEntity(enemy);
+            TheGameName.EntityController.RemoveEntity(enemy);
         spawnedEnemies.Clear();
+        Health = healthBar.MaxValue;
+        IsAlive = true;
     }
 
     public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
@@ -96,7 +98,11 @@ public class EnemySpawner: IGameEntity
     public void TakeDamage(double damage)
     {
         Health -= damage;
-        if (Health <= 0) IsAlive = false;
+        if (Health <= 0)
+        {
+            IsAlive = false;
+            TheGameName.DropSpawner.Spawn(Position, DropType.Activator, 1);
+        }
     }
 
     public void Collide(IGameEntity entity, IGameEntity entityToIntersect)

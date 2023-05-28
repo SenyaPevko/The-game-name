@@ -30,6 +30,17 @@ public class DropTextureContainer
         }
     }
     private Drop energy;
+
+    public Drop ActivatorDrop
+    {
+        get { return activator; }
+        set
+        {
+            activator = new Drop(DropType.Activator, value.Texture);
+            Drops.Add(activator.Type, activator);
+        }
+    }
+    private Drop activator;
 }
 
 public struct Drop

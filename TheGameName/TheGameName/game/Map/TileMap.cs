@@ -37,6 +37,7 @@ public class TileMap
     {
         this.data = data.Trim().Split("\n");
         tilesetTexture = contentManager.Load<Texture2D>($"Tiles/{this.data[0].Trim()}");
+        BuildMap();
     }
 
     public void BuildMap()
@@ -159,7 +160,7 @@ public class TileMap
     public bool InBounds(Vector2 position)
     {
         if (position.X > MapWidth * TileWidth || position.X < 0) return false;
-        if (position.Y > MapHeight * TileHeight || position.Y < 0) return false;
+        if (position.Y >= MapHeight * TileHeight || position.Y < 0) return false;
         return true; 
     }
 }

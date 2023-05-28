@@ -28,4 +28,9 @@ public interface IGameEntity: IUpdatable
     public void TakeDamage(double damage);
 
     public void Collide(IGameEntity entity, IGameEntity entityToIntersect);
+
+    public void Restart()
+    {
+        ;
+    }
 }

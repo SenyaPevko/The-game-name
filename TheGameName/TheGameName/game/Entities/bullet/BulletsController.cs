@@ -10,32 +10,25 @@ namespace TheGameName;
 
 public class BulletsContoller : IUpdatable
 {
-    private List<Bullet> bulletsFired = new List<Bullet>();
+    private HashSet<Bullet> bulletsFired;
     private Texture2D bulletTexture;
 
     public BulletsContoller(Texture2D bulletTexture)
     {
         this.bulletTexture = bulletTexture;
+        bulletsFired = new HashSet<Bullet>();
     }
 
     public void Update(GameTime gameTime)
     {
         foreach (var bullet in bulletsFired)
         {
+            if (!bullet.IsAlive)
+            {
+                bulletsFired.Remove(bullet);
+                continue;
+            }
             bullet.Update(gameTime);
-        }
-        for(var i = 0; i < bulletsFired.Count; i++)
-        {
-            RemoveBulletReachedScreenEnd(bulletsFired[i], i);
-        }
-    }
-
-    public void RemoveBulletReachedScreenEnd(Bullet bullet, int index)
-    {
-        if (bullet.Position.X > Globals.screenWidth - 50 || bullet.Position.Y > Globals.screenHeight - 50 || bullet.Position.X < 50 || bullet.Position.Y < 50)
-        {
-            if (bulletsFired.Count > index)
-                bulletsFired.RemoveAt(index);
         }
     }
 
@@ -43,6 +36,6 @@ public class BulletsContoller : IUpdatable
     {
         var bullet = new Bullet(bulletTexture, sender, target);
         bulletsFired.Add(bullet);
-        Globals.entityController.AddEntity(bullet);
+        TheGameName.EntityController.AddEntity(bullet);
     }
 }
