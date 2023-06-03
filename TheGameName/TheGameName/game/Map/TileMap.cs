@@ -1,16 +1,10 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
-using System.ComponentModel;
-using System.IO;
-using TheGameName;
-using Microsoft.VisualBasic;
-using System;
 using System.Collections.Generic;
 using System.Collections;
-using System.Runtime.CompilerServices;
 
+namespace TheGameName;
 
 public class TileMap
 {
@@ -125,7 +119,7 @@ public class TileMap
                     var neighborRow = tileRow + dx;
                     var neighborColumn = tileColumn + dy;
                     if(neighborRow>-1 && neighborRow<MapWidth && neighborColumn > -1 && neighborColumn < MapHeight)
-                        yield return Map[tileRow + dx, tileColumn + dy];
+                        yield return Map[neighborRow, neighborColumn];
                 }
     }
 
@@ -162,5 +156,14 @@ public class TileMap
         if (position.X > MapWidth * TileWidth || position.X < 0) return false;
         if (position.Y >= MapHeight * TileHeight || position.Y < 0) return false;
         return true; 
+    }
+
+    public int GetTileYIndex(Tile tile)
+    {
+        return (int)(tile.Position.Y / TileHeight);
+    }
+    public int GetTileXIndex(Tile tile)
+    {
+        return (int)(tile.Position.X / TileWidth);
     }
 }

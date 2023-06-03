@@ -1,10 +1,5 @@
-﻿using System;
-using System.Transactions;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using NUnit.Framework.Constraints;
 
 namespace TheGameName;
 
@@ -25,7 +20,7 @@ public class Portal : IGameEntity
     public int MaxEnergyAmount { get; private set; }
     public Texture2D Message { get; private set; }
     public int ActivatorsAmount { get; private set; }
-    public int CurrentActivatorsAmount { get; private set; } = 0;
+    public int CurrentActivatorsAmount { get; private set; }
     public bool IsActivated { get; private set; }
 
 
@@ -36,6 +31,7 @@ public class Portal : IGameEntity
         Position = position;
         Rectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
         CurrentEnergyAmount = 0;
+        CurrentActivatorsAmount = 0;
         MaxEnergyAmount = energyAmount;
         SetProgressBar();
         Message = Texture;
@@ -73,7 +69,11 @@ public class Portal : IGameEntity
 
     public void TakeEnergy(int energy)
     {
-        if(CurrentEnergyAmount >= MaxEnergyAmount) return;
+        if (CurrentEnergyAmount >= MaxEnergyAmount)
+        {
+            Activate();
+            return;
+        }
         CurrentEnergyAmount += energy;
     }
 
@@ -86,7 +86,7 @@ public class Portal : IGameEntity
 
     public void Activate()
     {
-        if(ActivatorsAmount >= CurrentActivatorsAmount)
+        if(CurrentActivatorsAmount >= ActivatorsAmount && CurrentEnergyAmount>=MaxEnergyAmount)
         {
             IsActivated = true;
         }

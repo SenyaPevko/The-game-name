@@ -1,16 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Security.Authentication.ExtendedProtection;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace TheGameName
 {
@@ -105,7 +97,7 @@ namespace TheGameName
                 EnergyMessage = energyMessage,
                 ActivatatorsMessage = activatorsMessage
             };
-            playerSpawn = new Portal(spawnTextureContainer, playerSpawnPosition + new Vector2(20, 0), 15, enemySpawners.Count);
+            playerSpawn = new Portal(spawnTextureContainer, playerSpawnPosition + new Vector2(20, 0), 25, 2);
             var cursorTexture = Content.Load<Texture2D>("Cursor/cursor");
             var bulletTexture = Content.Load<Texture2D>("bullet/bullet");
 
@@ -117,14 +109,61 @@ namespace TheGameName
             var enemyHealthBarFg = Content.Load<Texture2D>("Bars/HealthBar_Enemy_Fg");
             var enemyHealthBarBg = Content.Load<Texture2D>("Bars/HealthBar_Enemy_Bg");
 
-            var enemyMinionTexture = Content.Load<Texture2D>("Enemy/test");
-            var enemyBossTexture = Content.Load<Texture2D>("Enemy/slug_boss");
+            var ghostMinionWalkDown = Content.Load<Texture2D>("Enemy/ghost/down");
+            var ghostMinionWalkDownLeft = Content.Load<Texture2D>("Enemy/ghost/down-left");
+            var ghostMinionWalkDownRight = Content.Load<Texture2D>("Enemy/ghost/down-right");
+            var ghostMinionWalkUp = Content.Load<Texture2D>("Enemy/ghost/up");
+            var ghostMinionWalkUpLeft = Content.Load<Texture2D>("Enemy/ghost/up-left");
+            var ghostMinionWalkUpRight = Content.Load<Texture2D>("Enemy/ghost/up-right");
+            var ghostMinionWalkLeft = Content.Load<Texture2D>("Enemy/ghost/left");
+            var ghostMinionWalkRight = Content.Load<Texture2D>("Enemy/ghost/right");
+
             var enemySpawnerTexture = Content.Load<Texture2D>("Enemy/EnemySpawner");
 
-            var enemyTextureContainer = new EnemyTextureContainer
+            var ghostMinionTextureContainer = new EnemyTextureContainer
             {
-                Minion = enemyMinionTexture,
-                Boss = enemyBossTexture
+                WalkDown = ghostMinionWalkDown,
+                WalkDownLeft = ghostMinionWalkDownLeft,
+                WalkDownRight = ghostMinionWalkDownRight,
+                WalkUp = ghostMinionWalkUp,
+                WalkUpLeft = ghostMinionWalkUpLeft,
+                WalkUpRight = ghostMinionWalkUpRight,
+                WalkLeft = ghostMinionWalkLeft,
+                WalkRight = ghostMinionWalkRight,
+                HealthBarBg = enemyHealthBarBg,
+                HealthBarFg = enemyHealthBarFg
+            };
+            var ghostBossTextureContainer = new EnemyTextureContainer
+            {
+                WalkDown = Content.Load<Texture2D>("Enemy/GhostBoss/down"),
+                WalkDownLeft = Content.Load<Texture2D>("Enemy/GhostBoss/down-left"),
+                WalkDownRight = Content.Load<Texture2D>("Enemy/GhostBoss/down-right"),
+                WalkUp = Content.Load<Texture2D>("Enemy/GhostBoss/up"),
+                WalkUpLeft = Content.Load<Texture2D>("Enemy/GhostBoss/up-left"),
+                WalkUpRight = Content.Load<Texture2D>("Enemy/GhostBoss/up-right"),
+                WalkLeft = Content.Load<Texture2D>("Enemy/GhostBoss/left"),
+                WalkRight = Content.Load<Texture2D>("Enemy/GhostBoss/right"),
+                HealthBarBg = enemyHealthBarBg,
+                HealthBarFg = enemyHealthBarFg
+            };
+            var lastGhostTextureContainer = new EnemyTextureContainer
+            {
+                WalkDown = Content.Load<Texture2D>("Enemy/GhostBoss2/down"),
+                WalkDownLeft = Content.Load<Texture2D>("Enemy/GhostBoss2/down-left"),
+                WalkDownRight = Content.Load<Texture2D>("Enemy/GhostBoss2/down-right"),
+                WalkUp = Content.Load<Texture2D>("Enemy/GhostBoss2/up"),
+                WalkUpLeft = Content.Load<Texture2D>("Enemy/GhostBoss2/up-left"),
+                WalkUpRight = Content.Load<Texture2D>("Enemy/GhostBoss2/up-right"),
+                WalkLeft = Content.Load<Texture2D>("Enemy/GhostBoss2/left"),
+                WalkRight = Content.Load<Texture2D>("Enemy/GhostBoss2/right"),
+                HealthBarBg = enemyHealthBarBg,
+                HealthBarFg = enemyHealthBarFg
+            };
+            var enemies = new Dictionary<EnemyType, EnemyTextureContainer>()
+            {
+                {EnemyType.GhostMinion, ghostMinionTextureContainer },
+                {EnemyType.GhostBoss, ghostBossTextureContainer },
+                {EnemyType.LastGhost, lastGhostTextureContainer }
             };
 
             var healthDrop = Content.Load<Texture2D>("Drop/health");
@@ -174,9 +213,9 @@ namespace TheGameName
             WorldСursor = new Cursor(cursorTexture, camera);
             EntityController.AddEntity(WorldСursor);
             BulletsContoller = new BulletsContoller(bulletTexture);
-            enemySpawners.Add(new EnemySpawner(enemySpawnerTexture, enemyTextureContainer,
+            enemySpawners.Add(new EnemySpawner(enemySpawnerTexture, enemies,
                 new Vector2(128, 128), player, enemyHealthBarFg, enemyHealthBarBg));
-            enemySpawners.Add(new EnemySpawner(enemySpawnerTexture, enemyTextureContainer,
+            enemySpawners.Add(new EnemySpawner(enemySpawnerTexture, enemies,
                 new Vector2(96, 864), player, enemyHealthBarFg, enemyHealthBarBg));
             foreach (var enemySpawner in enemySpawners)
                 EntityController.AddEntity(enemySpawner);
@@ -192,13 +231,13 @@ namespace TheGameName
                     isActive = true;
                 return;
             }
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || 
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
                 Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
                 isActive = false;
                 return;
             }
-            if (!hasGameStarted||hasGameEnded)
+            if (!hasGameStarted || hasGameEnded)
             {
                 if (Keyboard.GetState().IsKeyDown(Keys.Enter))
                 {
@@ -273,6 +312,7 @@ namespace TheGameName
             Inventory.Restart(camera);
             DropSpawner.Restart();
             playerSpawn.Restart();
+            BulletsContoller.Restart();
         }
 
         public void EndGame()

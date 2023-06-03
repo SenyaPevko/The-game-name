@@ -1,9 +1,6 @@
-﻿using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
-using System.ComponentModel;
-using System;
 namespace TheGameName;
 
 public class Cursor : IGameEntity
@@ -32,7 +29,8 @@ public class Cursor : IGameEntity
     {
         Texture = texture;
         SetPosition(camera);
-        Rectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
+        Position -= new Vector2(-Texture.Width, Texture.Height);
+        Rectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height); 
     }
 
     public void Update(GameTime gameTime)

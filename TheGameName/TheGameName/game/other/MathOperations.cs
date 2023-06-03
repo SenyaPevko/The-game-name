@@ -1,10 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using static TheGameName.EnemyMovementAI;
 
 namespace TheGameName;
 public static class MathOperations
@@ -35,5 +31,13 @@ public static class MathOperations
         // calculate the angle
         float res = (float)(Math.Atan2(deltaY, deltaX));
         return res;
+    }
+
+    // расстояние без учета непроходимости тайлов
+    public static int GetHeuristicDistance(Node firstNode, Node secondNode)
+    {
+        var dstX = Math.Abs(firstNode.X - secondNode.X);
+        var dstY = Math.Abs(firstNode.Y - secondNode.Y);
+        return dstX + dstY;
     }
 }

@@ -25,4 +25,14 @@ public class RenderState : IUpdatable
     {
         Animation?.Update(gameTime);
     }
+
+    public void Play()
+    {
+        Animation?.Play();
+    }
+
+    public void Pause()
+    {
+        Animation.Pause();
+    }
 }

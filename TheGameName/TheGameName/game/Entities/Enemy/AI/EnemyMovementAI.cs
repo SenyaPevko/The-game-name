@@ -1,67 +1,127 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace TheGameName;
 
 public class EnemyMovementAI
 {
-    public EnemyMovementAI()
+    public class Node: IComparable<Node>
     {
-        
-    }
+        public bool Walkable { get; private set; }
+        public int X { get; private set; }
+        public int Y { get; private set; }
+        public int GCost { get; private set; } // стоимость от начала к этой ноде
+        public int HCost { get; private set; } // стоимость от этой ноды к концу, без учета непроходимости тайлов
+        public int FCost { get { return GCost + HCost; } }
+        public Node Parent { get; private set; }
+        public Tile Tile { get; private set; }
 
-    public Tile FindPath(TileMap map, Vector2 startPosition, Vector2 targetPosition)
-    {
-        var notVisited = map.ToList().ToHashSet();
-        var track = new Dictionary<Tile, DijkstraData>();
-        var startTile = map.GetTileByVectorPosition(startPosition);
-        var endTile = map.GetTileByVectorPosition(targetPosition);
-        track[startTile] = new DijkstraData { Price = 0, Previous = null };
-        while (true)
+        public Node(Tile tile, Node parent)
         {
-            Tile toOpen = null;
-            var bestPrice = double.PositiveInfinity;
-            foreach (var tile in notVisited)
-            {
-                if (track.ContainsKey(tile) && track[tile].Price < bestPrice && tile.Collision == TileCollision.Walkable)
-                {
-                    bestPrice = track[tile].Price;
-                    toOpen = tile;
-                }
-            }
-            if (toOpen == null) return null;
-            if (toOpen == endTile) break;
-            foreach (var nextNode in map.GetTileNeighbours(toOpen))
-            {
-                var currentPrice = track[toOpen].Price + toOpen.Damage;
-                if (!track.ContainsKey(nextNode) || track[nextNode].Price > currentPrice)
-                {
-                    track[nextNode] = new DijkstraData { Previous = toOpen, Price = currentPrice };
-                }
-            }
-            notVisited.Remove(toOpen);
+            Tile = tile;
+            Walkable = Tile.Collision == TileCollision.Walkable;
+            X = TheGameName.TileMap.GetTileXIndex(Tile);
+            Y = TheGameName.TileMap.GetTileYIndex(Tile);
+            Parent = parent;
         }
 
-        var result = new List<Tile>();
-        while (endTile != null)
+        public void SetDistance(Node targetNode)
         {
-            result.Add(endTile);
-            endTile = track[endTile].Previous;
+            HCost = MathOperations.GetHeuristicDistance(targetNode, this);
+            if (Parent != null)
+                GCost = Parent.GCost + MathOperations.GetHeuristicDistance(Parent, this);
         }
-        result.Reverse();
-        if (result.Count == 1) return result[0];
-        return result[1];
-    }
-}
 
-class DijkstraData
-{
-    public Tile Previous { get; set; }
-    public double Price { get; set; }
+        public void ChangeParent(Node parent)
+        {
+            Parent = parent;
+        }
+
+        public static bool operator ==(Node node1, Node node2)
+        {
+            if (node1 is null && node2 is null) return true;
+            if (node1 is null || node2 is null) return false;
+            return node1.X == node2.X && node1.Y == node2.Y;
+        }
+        public static bool operator !=(Node node1, Node node2)
+        {
+            if (node1 is null && node2 is null) return false;
+            if (node1 is null || node2 is null) return true;
+            return node1.X != node2.Y || node1.Y != node2.Y;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is not Node) return false;
+            var node = (Node)obj;
+            return X == node.X && Y == node.Y;
+        }
+
+        public override int GetHashCode()
+        {
+            return (X * 269 + Y) * 191;
+        }
+
+        public int CompareTo(Node other)
+        {
+            return FCost - other.FCost;
+        }
+    }
+    public Tile FindPath(Tile start, Tile target)
+    {
+        var startNode = new Node(start, null);
+        var targetNode = new Node(target, null);
+        startNode.SetDistance(targetNode);
+        var openedNodes = new PriorityQueue<Node>();
+        var closedNodes = new HashSet<Node>();
+        openedNodes.Enqueue(startNode);
+
+        while (openedNodes.Any())
+        {
+            // берем ноду с меньшим fcost
+            var currentNode = openedNodes.Dequeue();
+            closedNodes.Add(currentNode);
+
+            if (currentNode == targetNode)
+            {
+                targetNode.ChangeParent(currentNode);
+                var resultPath = ParseNodesIntoPath(startNode, targetNode);
+                return resultPath.Any() ? resultPath.Last().Tile : null;
+            }
+
+            // обход соседей
+            foreach (var tileNeighbor in TheGameName.TileMap.GetTileNeighbours(currentNode.Tile))
+            {
+                if (tileNeighbor == null) continue;
+                var neighbor = new Node(tileNeighbor, currentNode);
+
+                if (!neighbor.Walkable || closedNodes.Contains(neighbor))
+                    continue;
+
+                if (!openedNodes.Contains(neighbor))
+                {
+                    neighbor.SetDistance(targetNode);
+                    openedNodes.Enqueue(neighbor);
+                }
+            }
+        }
+        // нет пути
+        return null;
+    }
+
+
+    //путь от конца в начало
+    public IEnumerable<Node> ParseNodesIntoPath(Node startNode, Node targetNode)
+    {
+        var currentNode = targetNode;
+        while (currentNode != startNode)
+        {
+            if (currentNode.Parent == null)
+                break;
+            yield return currentNode;
+            currentNode = currentNode.Parent;
+        }
+    }
 }

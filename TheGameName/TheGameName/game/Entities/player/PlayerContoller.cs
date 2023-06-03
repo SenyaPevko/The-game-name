@@ -1,13 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using NUnit.Framework.Constraints;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TheGameName;
 
@@ -71,7 +64,7 @@ public class PlayerController : IUpdatable
         }
         if (currentKeyboardState.IsKeyDown(Keys.Q))
         {
-            player.Drop(1);
+            player.Drop(1, gameTime);
         }
         if (currentKeyboardState.IsKeyDown(Keys.LeftShift))
         {

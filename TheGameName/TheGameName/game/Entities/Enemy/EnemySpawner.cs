@@ -2,37 +2,33 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TheGameName;
 
 public class EnemySpawner: IGameEntity
 {
-    private List<IGameEntity> spawnedEnemies = new List<IGameEntity>();
-    private EnemyTextureContainer textureContainer;
+    private HashSet<IGameEntity> spawnedEnemies = new();
+    private Dictionary<EnemyType, EnemyTextureContainer> enemies;
     private Player player;
-    private double enemySpawnRate = 7000;
+    private double enemySpawnRate = 4500;
     private double enemySpawnTimer;
-    private double enemyBossSpawnRate = 40000;
+    private double enemyBossSpawnRate = 41379;
     private double enemyBossSpawnTimer;
     private ProgressBar healthBar;
 
     public Vector2 Position { get; private set; }
     public UpdateOrder UpdateOrder => UpdateOrder.Enemy;
     public DrawOrder DrawOrder => DrawOrder.Enemy;
-    public double Health { get; private set; } = 400;
+    public double Health { get; private set; } = 220;
     public double Damage { get; private set; } = 0.01;
     public bool IsAlive { get; private set; } = true;
     public Rectangle Rectangle { get; private set; }
     public EntityType Type => EntityType.Enemy;
     public Texture2D Texture;
 
-    public EnemySpawner(Texture2D texture, EnemyTextureContainer textureContainer, Vector2 position, Player player, Texture2D healthBarFg, Texture2D healthBarBg)
+    public EnemySpawner(Texture2D texture, Dictionary<EnemyType, EnemyTextureContainer> enemies, Vector2 position, Player player, Texture2D healthBarFg, Texture2D healthBarBg)
     {
-        this.textureContainer = textureContainer;
+        this.enemies = enemies;
         Position = position;
         this.player = player;
         healthBar = new ProgressBar(healthBarBg, healthBarFg, Health, Position, this);
@@ -42,35 +38,29 @@ public class EnemySpawner: IGameEntity
 
     public void Update(GameTime gameTime)
     {
-        SpawnEnemy(gameTime);
         healthBar.Update(Health);
-    }
-
-    public void SpawnEnemy(GameTime gameTime)
-    {
-        
         enemyBossSpawnTimer += gameTime.ElapsedGameTime.Milliseconds;
         if (enemyBossSpawnRate < enemyBossSpawnTimer)
         {
             enemyBossSpawnTimer = gameTime.ElapsedGameTime.Milliseconds;
-            var enemyBoss = new Enemy(Position, textureContainer.Boss, player, 100);
-            var bossHealthBar = new ProgressBar(healthBar.Background, healthBar.Foreground, 100,
-                Position + new Vector2(-textureContainer.Boss.Width / 4, -textureContainer.Boss.Height / 2), enemyBoss);
-            enemyBoss.SetHealthBar(bossHealthBar);
-            TheGameName.EntityController.AddEntity(enemyBoss);
-            spawnedEnemies.Add(enemyBoss);
+            SpawnEnemy(gameTime, enemies[EnemyType.GhostBoss], 100);
         }
+            
         enemySpawnTimer += gameTime.ElapsedGameTime.Milliseconds;
         if (enemySpawnRate < enemySpawnTimer)
         {
             enemySpawnTimer = gameTime.ElapsedGameTime.Milliseconds;
-            var enemy = new Enemy(Position, textureContainer.Minion, player, 12);
-            var healthBar = new ProgressBar(this.healthBar.Background, this.healthBar.Foreground, 8, 
-                Position + new Vector2(-textureContainer.Minion.Width/4,-textureContainer.Minion.Height/2), enemy);
-            enemy.SetHealthBar(healthBar);
-            TheGameName.EntityController.AddEntity(enemy);
-            spawnedEnemies.Add(enemy);
+            SpawnEnemy(gameTime, enemies[EnemyType.GhostMinion], 12);
         }
+            
+    }
+
+    public void SpawnEnemy(GameTime gameTime, EnemyTextureContainer textureContainer, double health)
+    {
+        var enemy = new Enemy(Position, textureContainer, player, health);
+        TheGameName.EntityController.AddEntity(enemy);
+        spawnedEnemies.Add(enemy);
+        enemy.SetProtection(gameTime);
     }
 
     public void ChangeTarget(Player player)
@@ -102,6 +92,9 @@ public class EnemySpawner: IGameEntity
         {
             IsAlive = false;
             TheGameName.DropSpawner.Spawn(Position, DropType.Activator, 1);
+            var enemy = new Enemy(Position, enemies[EnemyType.LastGhost], player, 120);
+            TheGameName.EntityController.AddEntity(enemy);
+            spawnedEnemies.Add(enemy);
         }
     }
 

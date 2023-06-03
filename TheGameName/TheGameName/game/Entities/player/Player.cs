@@ -1,22 +1,18 @@
-﻿using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace TheGameName;
 
 public class Player : IGameEntity, ICanAttack
 {
     private const int WALK_SPRITE_COUNT = 3;
-    private const int ATTACK_SPRITE_COUNT = 9;
-    private const int DAMAGED_SPRITE_COUNT = 2;
     private const int SPRITE_HEIGHT = 34;
     private const int SPRITE_WIDTH = 32;
     private const int MAGAZINE_SIZE = 10;
     private const double ATTACK_RATE = 100;
 
     private readonly RenderStateController renderStateController = new RenderStateController();
+    private PlayerTextureContainer textureContainer;
     private readonly ProgressBar shootingBar;
     private double damageRate = 5000;
     private double damageTimer;
@@ -26,6 +22,8 @@ public class Player : IGameEntity, ICanAttack
     private double dodgingTime = 700;
     private double takingDamageTimer;
     private double takingDamageDuration = 100;
+    private double dropRate = 200;
+    private double dropTimer = 201;
     public bool IsDodging { get; private set; }
 
     public float Speed { get; private set; } = 2;
@@ -50,30 +48,13 @@ public class Player : IGameEntity, ICanAttack
     {
         Position = position;
         SpriteOrigin = new Vector2(SPRITE_WIDTH / 2f, SPRITE_HEIGHT / 1.3f);
-        renderStateController.AddState(nameof(PlayerTextureContainer.WalkDown),
-            new SpriteAnimation(textureContainer.WalkDown, WALK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT, SpriteOrigin));
-        renderStateController.AddState(nameof(PlayerTextureContainer.WalkDownLeft),
-            new SpriteAnimation(textureContainer.WalkDownLeft, WALK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT, SpriteOrigin));
-        renderStateController.AddState(nameof(PlayerTextureContainer.WalkDownRight),
-            new SpriteAnimation(textureContainer.WalkDownRight, WALK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT, SpriteOrigin));
-        renderStateController.AddState(nameof(PlayerTextureContainer.WalkUp),
-            new SpriteAnimation(textureContainer.WalkUp, WALK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT, SpriteOrigin));
-        renderStateController.SetState(nameof(PlayerTextureContainer.WalkUp));
-        renderStateController.AddState(nameof(PlayerTextureContainer.WalkUpRight),
-            new SpriteAnimation(textureContainer.WalkUpRight, WALK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT, SpriteOrigin));
-        renderStateController.AddState(nameof(PlayerTextureContainer.WalkUpLeft),
-            new SpriteAnimation(textureContainer.WalkUpLeft, WALK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT, SpriteOrigin));
-        renderStateController.AddState(nameof(PlayerTextureContainer.WalkRight),
-            new SpriteAnimation(textureContainer.WalkRight, WALK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT, SpriteOrigin));
-        renderStateController.AddState(nameof(PlayerTextureContainer.WalkLeft),
-            new SpriteAnimation(textureContainer.WalkLeft, WALK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT, SpriteOrigin));
-
+        this.textureContainer = textureContainer;
+        AddAnimationStates();
         Rectangle = new Rectangle((int)Position.X, (int)Position.Y, SPRITE_WIDTH, SPRITE_HEIGHT);
         Health = health;
         maxHealth = health;
         IsDodging = false;
         Color = Color.White;
-        SpriteOrigin = new Vector2(SPRITE_WIDTH / 2f, SPRITE_HEIGHT / 1.3f);
         this.shootingBar = new ProgressBar(shootingBar.Background, shootingBar.Foreground, AttackCounter, Position - SpriteOrigin, this);
     }
 
@@ -103,7 +84,7 @@ public class Player : IGameEntity, ICanAttack
         CurrentDirection = direction;
         CurrentState = state;
         renderStateController.SetState(state);
-        renderStateController.CurrentState.Animation.Play();
+        renderStateController.CurrentState.Play();
         var nextPosition = Position + direction * Speed;
         var nextRectangle = new Rectangle(nextPosition.ToPoint(), Rectangle.Size);
         var nextTile = TheGameName.TileMap.GetTileByVectorPosition(nextPosition);
@@ -115,8 +96,8 @@ public class Player : IGameEntity, ICanAttack
     public void Halt()
     {
         renderStateController.SetState(CurrentState);
-        renderStateController.CurrentState.Animation.Play();
-        renderStateController.CurrentState.Animation.Pause();
+        renderStateController.CurrentState.Play();
+        renderStateController.CurrentState.Pause();
     }
 
     public bool Attack(GameTime gameTime)
@@ -184,7 +165,7 @@ public class Player : IGameEntity, ICanAttack
             IsDodging = true;
             TextureOpacity = 0.8f;
             dodgeTimer = 0;
-            Speed *= 2;
+            Speed *= 1.8f;
             Color = Color.SlateGray;
         }
     }
@@ -192,7 +173,6 @@ public class Player : IGameEntity, ICanAttack
     public void StopDodging(GameTime gameTime)
     {
         dodgeTimer += gameTime.ElapsedGameTime.Milliseconds;
-
         if (dodgingTime < dodgeTimer)
         {
             IsDodging = false;
@@ -210,9 +190,35 @@ public class Player : IGameEntity, ICanAttack
         }
     }
 
-    public void Drop(int amount)
+    public void Drop(int amount, GameTime gameTime)
     {
-        TheGameName.Inventory.Drop(Position + CurrentDirection * 
-            new Vector2(SPRITE_WIDTH + 5, SPRITE_HEIGHT + 5), amount);
+        dropTimer += gameTime.ElapsedGameTime.Milliseconds;
+        if (dropRate < dropTimer)
+        {
+            TheGameName.Inventory.Drop(Position + CurrentDirection *
+                new Vector2(SPRITE_WIDTH + 5, SPRITE_HEIGHT + 5), amount);
+            dropTimer = gameTime.ElapsedGameTime.Milliseconds;
+        }
+    }
+
+    public void AddAnimationStates()
+    {
+        renderStateController.AddState(nameof(PlayerTextureContainer.WalkDown),
+            new SpriteAnimation(textureContainer.WalkDown, WALK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT, SpriteOrigin));
+        renderStateController.AddState(nameof(PlayerTextureContainer.WalkDownLeft),
+            new SpriteAnimation(textureContainer.WalkDownLeft, WALK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT, SpriteOrigin));
+        renderStateController.AddState(nameof(PlayerTextureContainer.WalkDownRight),
+            new SpriteAnimation(textureContainer.WalkDownRight, WALK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT, SpriteOrigin));
+        renderStateController.AddState(nameof(PlayerTextureContainer.WalkUp),
+            new SpriteAnimation(textureContainer.WalkUp, WALK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT, SpriteOrigin));
+        renderStateController.SetState(nameof(PlayerTextureContainer.WalkUp));
+        renderStateController.AddState(nameof(PlayerTextureContainer.WalkUpRight),
+            new SpriteAnimation(textureContainer.WalkUpRight, WALK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT, SpriteOrigin));
+        renderStateController.AddState(nameof(PlayerTextureContainer.WalkUpLeft),
+            new SpriteAnimation(textureContainer.WalkUpLeft, WALK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT, SpriteOrigin));
+        renderStateController.AddState(nameof(PlayerTextureContainer.WalkRight),
+            new SpriteAnimation(textureContainer.WalkRight, WALK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT, SpriteOrigin));
+        renderStateController.AddState(nameof(PlayerTextureContainer.WalkLeft),
+            new SpriteAnimation(textureContainer.WalkLeft, WALK_SPRITE_COUNT, SPRITE_WIDTH, SPRITE_HEIGHT, SpriteOrigin));
     }
 }
