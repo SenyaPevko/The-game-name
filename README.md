@@ -1,3 +1,3 @@
 # The-game-name
 Козлов Данил АТ-06
-Description of the game. Will think of later
+A simple top-down shooter made using monogame framework
