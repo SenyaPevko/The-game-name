@@ -7,7 +7,8 @@
     Player = 4,
     Portal = 5,
     Inventory = 6,
-    Cursor = 7
+    ProgressBar = 7,
+    Cursor = 8
 }
 public enum UpdateOrder
 {
@@ -18,5 +19,6 @@ public enum UpdateOrder
     Portal = 4,
     Player = 5,
     Inventory = 6,
-    Cursor = 7
+    ProgressBar = 7,
+    Cursor = 8
 }

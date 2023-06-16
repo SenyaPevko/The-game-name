@@ -8,12 +8,11 @@ public class Player : IGameEntity, ICanAttack
     private const int WALK_SPRITE_COUNT = 3;
     private const int SPRITE_HEIGHT = 34;
     private const int SPRITE_WIDTH = 32;
-    private const int MAGAZINE_SIZE = 10;
+
     private const double ATTACK_RATE = 100;
 
     private readonly RenderStateController renderStateController = new RenderStateController();
     private PlayerTextureContainer textureContainer;
-    private readonly ProgressBar shootingBar;
     private double damageRate = 5000;
     private double damageTimer;
     private double maxHealth;
@@ -36,7 +35,8 @@ public class Player : IGameEntity, ICanAttack
     public bool IsAlive { get; private set; } = true;
     public Rectangle Rectangle { get; private set; }
     public EntityType Type { get; private set; } = EntityType.Player;
-    public int AttackCounter { get; private set; } = MAGAZINE_SIZE;
+    public int MagazineSize { get; private set; } = 10;
+    public int AttackCounter { get; private set; } = 10;
     public double AttackDelayTimer { get; set; }
     public float TextureOpacity { get; private set; } = 1;
     public Color Color { get; private set; }
@@ -44,7 +44,7 @@ public class Player : IGameEntity, ICanAttack
     public Vector2 SpriteOrigin { get; private set; }
 
 
-    public Player(PlayerTextureContainer textureContainer, Vector2 position, double health, ProgressBar shootingBar)
+    public Player(PlayerTextureContainer textureContainer, Vector2 position, double health)
     {
         Position = position;
         SpriteOrigin = new Vector2(SPRITE_WIDTH / 2f, SPRITE_HEIGHT / 1.3f);
@@ -55,20 +55,17 @@ public class Player : IGameEntity, ICanAttack
         maxHealth = health;
         IsDodging = false;
         Color = Color.White;
-        this.shootingBar = new ProgressBar(shootingBar.Background, shootingBar.Foreground, AttackCounter, Position - SpriteOrigin, this);
     }
 
     public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
     {
         renderStateController.Draw(spriteBatch, Position, SpriteEffects.None, TextureOpacity, Color);
-        shootingBar.Draw(spriteBatch, gameTime);
     }
 
     public void Update(GameTime gameTime)
     {
         renderStateController.Update(gameTime);
         Rectangle = new Rectangle((int)Position.X, (int)Position.Y, SPRITE_WIDTH, SPRITE_HEIGHT);
-        shootingBar.Update(AttackCounter);
         damageTimer += gameTime.ElapsedGameTime.Milliseconds;
         if (damageRate < damageTimer)
         {
@@ -116,7 +113,7 @@ public class Player : IGameEntity, ICanAttack
 
     public void Reload(GameTime gameTime)
     {
-        AttackCounter = MAGAZINE_SIZE;
+        AttackCounter = MagazineSize;
         AttackDelayTimer = -1000;
     }
 

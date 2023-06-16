@@ -7,5 +7,6 @@
     Drop,
     Portal,
     Cursor,
-    Inventory
+    Inventory,
+    ProgressBar
 }

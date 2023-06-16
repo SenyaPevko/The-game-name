@@ -30,7 +30,9 @@ public class BulletsContoller : IUpdatable
 
     public void AddBulletToFired(IGameEntity sender, Vector2 target)
     {
-        var bullet = new Bullet(bulletTexture, sender, target);
+        var color = Color.Coral;
+        if (sender.Type == EntityType.Player) color = Color.Aqua; 
+        var bullet = new Bullet(bulletTexture, sender, target, color);
         firedBullets.Add(bullet);
         TheGameName.EntityController.AddEntity(bullet);
     }

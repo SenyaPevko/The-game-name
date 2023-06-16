@@ -199,14 +199,16 @@ namespace TheGameName
                 WalkRight = walkRightTexture
             };
             playerTextureContainer = container;
-            playerShootingBar = new ProgressBar(playerShootingBarBg, playerShootingBarFg, 0, Vector2.Zero, null);
-            player = new Player(container, playerSpawnPosition, playerHealth, playerShootingBar);
+            player = new Player(container, playerSpawnPosition, playerHealth);
             camera = new Camera(player);
             Inventory = new Inventory(inventoryTextureContainer,
                 camera.Position - new Vector2(ScreenWidth / 2, -ScreenHeight / 2 + 50), camera);
             EntityController.AddEntity(Inventory);
             playerHealthBar = new ProgressBar(playerHealthBarBg, playerHealthBarFg, playerHealth,
                 camera.Position - new Vector2(ScreenWidth / 2, ScreenHeight / 2), camera);
+            playerShootingBar = new ProgressBar(playerShootingBarBg, playerShootingBarFg, player.MagazineSize, 
+                camera.Position - new Vector2(ScreenWidth / 2 - playerHealthBarBg.Width - 10, ScreenHeight / 2 - 3),
+                camera);
             EntityController.AddEntity(player);
             EntityController.AddEntity(playerSpawn);
             playerController = new PlayerController(player);
@@ -255,6 +257,7 @@ namespace TheGameName
             EntityController.Update(gameTime);
             playerController.Update(gameTime);
             playerHealthBar.Update(player.Health);
+            playerShootingBar.Update(player.AttackCounter);
             if (!player.IsAlive)
             {
                 Restart();
@@ -290,12 +293,15 @@ namespace TheGameName
             TileMap.Draw(_spriteBatch, gameTime);
             EntityController.Draw(_spriteBatch, gameTime);
             playerHealthBar.Draw(_spriteBatch, gameTime);
+            playerShootingBar.Draw(_spriteBatch, gameTime);
+            _spriteBatch.DrawString(FontThin, $"{player.AttackCounter}", 
+                playerShootingBar.Position + new Vector2(30,0), Color.White);
             _spriteBatch.End();
         }
 
         public void Restart()
         {
-            player = new Player(playerTextureContainer, playerSpawnPosition, playerHealth, playerShootingBar);
+            player = new Player(playerTextureContainer, playerSpawnPosition, playerHealth);
             hasGameStarted = false;
             EntityController.AddEntity(player);
             playerController = new PlayerController(player);
@@ -308,6 +314,9 @@ namespace TheGameName
             }
             playerHealthBar = new ProgressBar(playerHealthBar.Background, playerHealthBar.Foreground, playerHealth,
                 camera.Position - new Vector2(ScreenWidth / 2, ScreenHeight / 2), camera);
+            playerShootingBar = new ProgressBar(playerShootingBar.Background, playerShootingBar.Foreground, player.MagazineSize,
+                camera.Position - new Vector2(ScreenWidth / 2 - playerHealthBar.Background.Width - 10, 
+                ScreenHeight / 2), camera);
             WorldСursor.Restart(camera);
             Inventory.Restart(camera);
             DropSpawner.Restart();

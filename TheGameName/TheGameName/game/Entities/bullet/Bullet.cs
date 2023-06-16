@@ -20,8 +20,9 @@ public class Bullet : IGameEntity
     public bool IsAlive { get; private set; } = true;
     public EntityType Type { get; private set; } = EntityType.Bullet;
     public IGameEntity Sender { get; private set; }
+    public Color Color { get; private set; }
 
-    public Bullet(Texture2D Texture, IGameEntity sender, Vector2 target)
+    public Bullet(Texture2D Texture, IGameEntity sender, Vector2 target, Color color)
     {
         this.Texture = Texture;
         Position = sender.Position;
@@ -29,6 +30,7 @@ public class Bullet : IGameEntity
         rotation = MathOperations.GetAngleBetweenPoints(sender.Position.ToPoint(), target.ToPoint());
         Rectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
         Sender = sender;
+        Color = color;
     }
 
     public void Update(GameTime gameTime)
@@ -39,7 +41,7 @@ public class Bullet : IGameEntity
 
     public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
     {
-        spriteBatch.Draw(Texture, Position, null, Color.Aqua, rotation,
+        spriteBatch.Draw(Texture, Position, null, Color, rotation,
             new Vector2(Texture.Width / 2, Texture.Height / 2), 1.0f, SpriteEffects.None, 0f);
     }
 

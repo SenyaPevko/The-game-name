@@ -24,7 +24,7 @@ public class TileMap
     public Tile[,] Map { get; private set; }
     public int TileWidth { get; private set; }
     public int TileHeight { get; private set; }
-    public double LevelDamage { get; private set; } = 1;
+    public double LevelDamage { get; private set; } = 0.5;
 
 
     public TileMap(string data, ContentManager contentManager)
