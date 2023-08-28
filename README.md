@@ -1,3 +1,2 @@
 # The-game-name
-Козлов Данил АТ-06
-A simple top-down shooter made using monogame framework
+Simple 2d shooting game written on c# using monogame framework
